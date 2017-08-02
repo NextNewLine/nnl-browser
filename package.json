@@ -1,0 +1,26 @@
+{
+  "name": "m14-browser",
+  "version": "0.0.1",
+  "description": "A promise controlled browser ideal for testing",
+  "main": "Browser.js",
+  "scripts": {
+    "test": "./run_tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M14Industries/m14-browser.git"
+  },
+  "keywords": [
+    "browser",
+    "testing"
+  ],
+  "dependencies": {
+    "phantom": "4.*"
+  },
+  "author": "John Kershaw",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/M14Industries/m14-browser/issues"
+  },
+  "homepage": "https://github.com/M14Industries/m14-browser#readme"
+}
