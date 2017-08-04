@@ -41,6 +41,15 @@ module.exports = function(args) {
 		});
 	}
 
+	var select = function(selector, value) {
+		return new Promise(function(resolve, reject) {
+			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) {if (selectObj.options && selectObj.options[i] && selectObj.options[i].text=='" + value +"') { selectObj.options[i].selected = true;return;}}}";
+			phantomPage.evaluateJavaScript(script).then(html => {
+				resolve();
+			});
+		});
+	}
+
 	var reload = function() {
 		return new Promise(function(resolve, reject) {
 			phantomPage.property("url").then(url => {
@@ -203,6 +212,7 @@ module.exports = function(args) {
 	return {
 		visit,
 		fill,
+		select,
 		reload,
 		pressButton,
 		clickLink,
