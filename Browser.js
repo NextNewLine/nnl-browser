@@ -1,6 +1,5 @@
 const phantom = require('phantom');
 
-const waitForRedirection = 3000; // how long to wait for a redirection after a button or link has been clicked?
 // used for Mocha tests
 process.on('unhandledRejection', function(reason) {
 	throw reason;
@@ -9,8 +8,13 @@ process.on('unhandledRejection', function(reason) {
 module.exports = function(args) {
 
 	var baseUrl = "http://localhost:3000";
+	var waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
+	
 	if (args && args.site) {
 		baseUrl = args.site;
+	}
+	if (args && args.waitForRedirection) {
+		waitForRedirection = args.waitForRedirection;
 	}
 
 	var phantomPage;
