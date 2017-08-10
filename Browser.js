@@ -36,6 +36,13 @@ module.exports = function(args) {
 		});
 	}
 
+	var reload = function() {
+		return new Promise(async function(resolve, reject) {
+			let url = await phantomPage.property("url");
+			visit(url);
+		});
+	}
+
 	var fill = function(selector, value) {
 		return new Promise(function(resolve, reject) {
 			var script = "function(){ document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + ",textarea[name='" + selector + "'],textarea" + selector + "\")[0].value = '" + value + "'; }";
@@ -139,6 +146,7 @@ module.exports = function(args) {
 				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
 			phantomPage.evaluateJavaScript(script).then(text => {
+				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'');
 				resolve(text);
 			});
 		});
@@ -187,7 +195,7 @@ module.exports = function(args) {
 					phantomPage = page;
 
 					phantomPage.on("onLoadFinished", async function() {
-						let url = await phantomPage.property("url")
+						let url = await phantomPage.property("url");
 						log("onLoadFinished " + url);
 						if (callbackWaiting) {
 							callbackWaiting();
@@ -215,6 +223,7 @@ module.exports = function(args) {
 
 	return {
 		visit,
+		reload,
 		fill,
 		select,
 		reload,
