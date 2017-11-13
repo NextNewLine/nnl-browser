@@ -84,7 +84,7 @@ module.exports = function(args) {
 			if (selector.indexOf(".") === -1 && selector.indexOf("#") === -1) {
 				script = "function(){ var debug; var possibleButtons = document.querySelectorAll(\"button, input, a.btn\"); var buttonToClick; for (var i = 0; i < possibleButtons.length; i++) { if (possibleButtons[i].innerText.indexOf('" + selector + "') !== -1){buttonToClick = possibleButtons[i]};} if(!buttonToClick){ return 'No button found for " + selector + "'; } buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1) {window.location.href = href}}";
 			} else {
-				script = "function(){ var debug; var buttonToClick = document.querySelectorAll(\"button" + selector + ", input" + selector + ", a.btn" + selector + "\")[0]; buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1) {window.location.href = href}}";
+				script = "function(){ var debug; var buttonToClick = document.querySelectorAll(\"button" + selector + ", input" + selector + ", a.btn" + selector + "\")[0]; buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1 && href[0] !== '#') {window.location.href = href}}";
 			}
 
 			phantomPage.evaluateJavaScript(script).then((text) => {
@@ -111,9 +111,9 @@ module.exports = function(args) {
 
 			let script = "";
 			if (selector.indexOf(".") === -1 && selector.indexOf("#") === -1) { //    var possibleButtons = document.querySelectorAll(\"button, input, a.btn\"); var buttonToClick; for (var i = 0; i < possibleButtons.length; i++) { console.debug(possibleButtons[i].innerText); if (possibleButtons[i].innerText == \"" + selector + "\"){ buttonToClick = possibleButtons;}}  if (buttonToClick){ buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1) {window.location.href = href}} else {console.log('No Link found')}
-				script = "function(){ var selector = $(\"a:contains('" + selector + "')\").first(); selector.trigger('click'); if (selector.attr('href') && selector.attr('href').length > 1) { window.location.href = selector.attr('href');} }";
+				script = "function(){ var selector = $(\"a:contains('" + selector + "')\").first(); selector.trigger('click'); if (selector.attr('href') && selector.attr('href').length > 1&& selector.attr('href')[0] !== '#') { window.location.href = selector.attr('href');} }";
 			} else {
-				script = "function(){ var selector = $(\"" + selector + "\").first(); selector.trigger('click'); if (selector.attr('href') && selector.attr('href').length) { window.location.href = selector.attr('href');} }";
+				script = "function(){ var selector = $(\"" + selector + "\").first(); selector.trigger('click'); if (selector.attr('href') && selector.attr('href').length&& selector.attr('href')[0] !== '#') { window.location.href = selector.attr('href');} }";
 			}
 
 			phantomPage.evaluateJavaScript(script).then(() => {
@@ -146,7 +146,7 @@ module.exports = function(args) {
 				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
 			phantomPage.evaluateJavaScript(script).then(text => {
-				text = text.replace(/\r?\n|\r|\t/g, " ").replace(/ +(?= )/g,'');
+				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'');
 				resolve(text);
 			});
 		});
