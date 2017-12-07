@@ -146,7 +146,7 @@ module.exports = function(args) {
 				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
 			phantomPage.evaluateJavaScript(script).then(text => {
-				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'');
+				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'').replace(/\t/g, " ");;
 				resolve(text);
 			});
 		});
