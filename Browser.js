@@ -31,14 +31,20 @@ module.exports = function(args) {
 			await phantomPage.open(baseUrl + url);
 			await html();
 
-			resolve();
+			setTimeout(resolve, 100);
 		});
 	}
 
 	var reload = function() {
+		log("Reloading");
 		return new Promise(async function(resolve, reject) {
+			
 			let url = await phantomPage.property("url");
-			await visit(url);
+
+			await createPhantom();
+			await phantomPage.open(url);
+			await html();
+
 			resolve();
 		});
 	}
@@ -119,25 +125,23 @@ module.exports = function(args) {
 
 	// TODO don't use jQuery
 	var choose = function(selector) {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 			var script = "function(){ $(\"input[name='" + selector + "'],input[value='" + selector + "'],input" + selector + "\").prop('checked',true); }";
-			phantomPage.evaluateJavaScript(script).then(function() {
-				resolve();
-			});
+			await phantomPage.evaluateJavaScript(script);
+			resolve();
 		});
 	}
 
 	var text = function(selector) {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 
 			var script = "function(){ return document.querySelectorAll(\"" + selector + "\")[0].innerText || document.querySelectorAll(\"" + selector + "\")[0].value}";
 			if (!selector) {
-				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
+				script = "function(){ var pageText = document.querySelector(\"body\").innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
-			phantomPage.evaluateJavaScript(script).then(text => {
-				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'').replace(/\t/g, " ");;
-				resolve(text);
-			});
+			var text = await phantomPage.evaluateJavaScript(script);
+			text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'').replace(/\t/g, " ");
+			resolve(text);
 		});
 	}
 
