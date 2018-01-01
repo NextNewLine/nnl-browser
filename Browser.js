@@ -141,7 +141,7 @@ module.exports = function(args) {
 	}
 
 	var html = function() {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 			const content = await phantomPage.property('content');
 			resolve(content);
 		});
