@@ -38,7 +38,8 @@ module.exports = function(args) {
 	var reload = function() {
 		return new Promise(async function(resolve, reject) {
 			let url = await phantomPage.property("url");
-			visit(url);
+			await visit(url);
+			resolve();
 		});
 	}
 
