@@ -25,43 +25,48 @@ module.exports = function(args) {
 
 	var visit = function(url) {
 		log("Visiting " + url);
-		return new Promise(async function(resolve, reject) {
-
-			await createPhantom();
-			await phantomPage.open(baseUrl + url);
-			await html();
-
-			setTimeout(resolve, 100);
+		return new Promise(function(resolve, reject) {
+			createPhantom().then(function() {
+				var urlToOpen = baseUrl + url;
+				phantomPage.open(urlToOpen).then(async function(status) {
+					await text();
+					resolve();
+				});
+			});
 		});
 	}
 
 	var reload = function() {
-		log("Reloading");
 		return new Promise(async function(resolve, reject) {
-			
 			let url = await phantomPage.property("url");
-
-			await createPhantom();
-			await phantomPage.open(url);
-			await html();
-
-			resolve();
+			visit(url);
 		});
 	}
 
 	var fill = function(selector, value) {
-		return new Promise(async function(resolve, reject) {
+		return new Promise(function(resolve, reject) {
 			var script = "function(){ document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + ",textarea[name='" + selector + "'],textarea" + selector + "\")[0].value = '" + value + "'; }";
-			await phantomPage.evaluateJavaScript(script);
-			resolve();
+			phantomPage.evaluateJavaScript(script).then(html => {
+				resolve();
+			});
 		});
 	}
 
 	var select = function(selector, value) {
-		return new Promise(async function(resolve, reject) {
+		return new Promise(function(resolve, reject) {
 			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) {if (selectObj.options && selectObj.options[i] && selectObj.options[i].text=='" + value +"') { selectObj.options[i].selected = true;return;}}}";
-			await phantomPage.evaluateJavaScript(script);
-			resolve();
+			phantomPage.evaluateJavaScript(script).then(html => {
+				resolve();
+			});
+		});
+	}
+
+	var reload = function() {
+		return new Promise(function(resolve, reject) {
+			phantomPage.property("url").then(url => {
+				url = url.replace(baseUrl, "");
+				visit(url).then(resolve);
+			});
 		});
 	}
 
@@ -125,30 +130,34 @@ module.exports = function(args) {
 
 	// TODO don't use jQuery
 	var choose = function(selector) {
-		return new Promise(async function(resolve, reject) {
+		return new Promise(function(resolve, reject) {
 			var script = "function(){ $(\"input[name='" + selector + "'],input[value='" + selector + "'],input" + selector + "\").prop('checked',true); }";
-			await phantomPage.evaluateJavaScript(script);
-			resolve();
+			phantomPage.evaluateJavaScript(script).then(function() {
+				resolve();
+			});
 		});
 	}
 
 	var text = function(selector) {
-		return new Promise(async function(resolve, reject) {
+		return new Promise(function(resolve, reject) {
 
 			var script = "function(){ return document.querySelectorAll(\"" + selector + "\")[0].innerText || document.querySelectorAll(\"" + selector + "\")[0].value}";
 			if (!selector) {
-				script = "function(){ var pageText = document.querySelector(\"body\").innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
+				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
-			var text = await phantomPage.evaluateJavaScript(script);
-			text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'').replace(/\t/g, " ");
-			resolve(text);
+			phantomPage.evaluateJavaScript(script).then(text => {
+				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'').replace(/\t/g, " ");;
+				resolve(text);
+			});
 		});
 	}
 
 	var html = function() {
-		return new Promise(async function(resolve, reject) {
-			const content = await phantomPage.property('content');
-			resolve(content);
+		return new Promise(function(resolve, reject) {
+			var script = "function(){ return $(\"html\").html(); }";
+			phantomPage.evaluateJavaScript(script).then(html => {
+				resolve(html);
+			});
 		});
 	}
 
@@ -167,7 +176,7 @@ module.exports = function(args) {
 
 	var createPhantom = function() {
 
-		return new Promise(async function(resolve, reject) {
+		return new Promise(function(resolve, reject) {
 
 			if (phantomPage) {
 				if (phantomPage !== true) {
@@ -180,27 +189,31 @@ module.exports = function(args) {
 
 			phantomPage = true;
 
-			phantomInstance  = await phantom.create(['--ignore-ssl-errors=yes', '--load-images=no'])
-			phantomPage = await phantomInstance.createPage();
+			phantom.create(['--ignore-ssl-errors=yes', '--load-images=no']).then(function(instance) {
+				phantomInstance = instance;
+				instance.createPage().then(function(page) {
+					phantomPage = page;
 
-			phantomPage.on("onLoadFinished", async function() {
-				let url = await phantomPage.property("url");
-				log("onLoadFinished " + url);
-				if (callbackWaiting) {
-					callbackWaiting();
-					clearTimeout(redirectTimeout);
-					callbackWaiting = false;
-				}
-				navigationRequested = false;
+					phantomPage.on("onLoadFinished", async function() {
+						let url = await phantomPage.property("url");
+						log("onLoadFinished " + url);
+						if (callbackWaiting) {
+							callbackWaiting();
+							clearTimeout(redirectTimeout);
+							callbackWaiting = false;
+						}
+						navigationRequested = false;
+					});
+
+					phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
+						log("onNavigationRequested " + url);
+						navigationRequested = true;
+					});
+
+					resolve();
+
+				});
 			});
-
-			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
-				log("onNavigationRequested " + url);
-				navigationRequested = true;
-			});
-
-			resolve();
-
 		});
 	}
 
