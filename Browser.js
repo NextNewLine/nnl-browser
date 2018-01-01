@@ -30,7 +30,9 @@ module.exports = function(args) {
 				var urlToOpen = baseUrl + url;
 				phantomPage.open(urlToOpen).then(async function(status) {
 					await text();
-					resolve();
+					setTimeout(function(){
+						resolve();
+					}, 100);
 				});
 			});
 		});
