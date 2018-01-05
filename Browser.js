@@ -9,7 +9,7 @@ module.exports = function(args) {
 
 	var baseUrl = "http://localhost:3000";
 	var waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
-	
+
 	if (args && args.site) {
 		baseUrl = args.site;
 	}
@@ -30,7 +30,7 @@ module.exports = function(args) {
 				var urlToOpen = baseUrl + url;
 				phantomPage.open(urlToOpen).then(async function(status) {
 					await text();
-					setTimeout(function(){
+					setTimeout(function() {
 						resolve();
 					}, 100);
 				});
@@ -56,7 +56,7 @@ module.exports = function(args) {
 
 	var select = function(selector, value) {
 		return new Promise(function(resolve, reject) {
-			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) {if (selectObj.options && selectObj.options[i] && selectObj.options[i].text=='" + value +"') { selectObj.options[i].selected = true;return;}}}";
+			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) {if (selectObj.options && selectObj.options[i] && selectObj.options[i].text=='" + value + "') { selectObj.options[i].selected = true;return;}}}";
 			phantomPage.evaluateJavaScript(script).then(html => {
 				resolve();
 			});
@@ -148,7 +148,7 @@ module.exports = function(args) {
 				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
 			phantomPage.evaluateJavaScript(script).then(text => {
-				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g,'').replace(/\t/g, " ");;
+				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
 				resolve(text);
 			});
 		});
@@ -178,7 +178,7 @@ module.exports = function(args) {
 
 	var createPhantom = function() {
 
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 
 			if (phantomPage) {
 				if (phantomPage !== true) {
@@ -191,32 +191,40 @@ module.exports = function(args) {
 
 			phantomPage = true;
 
-			phantom.create(['--ignore-ssl-errors=yes', '--load-images=no']).then(function(instance) {
-				phantomInstance = instance;
-				instance.createPage().then(function(page) {
-					phantomPage = page;
+			phantomInstance = await phantom.create(['--ignore-ssl-errors=yes', '--load-images=no']);
+			phantomPage = await phantomInstance.createPage();
 
-					phantomPage.on("onLoadFinished", async function() {
-						let url = await phantomPage.property("url");
-						log("onLoadFinished " + url);
-						if (callbackWaiting) {
-							callbackWaiting();
-							clearTimeout(redirectTimeout);
-							callbackWaiting = false;
-						}
-						navigationRequested = false;
-					});
+			if (basicAuthUsername && basicAuthPassword) {
+				await phantomPage.setting("userName", basicAuthUsername);
+				await phantomPage.setting("password", basicAuthPassword);
+			}
 
-					phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
-						log("onNavigationRequested " + url);
-						navigationRequested = true;
-					});
-
-					resolve();
-
-				});
+			phantomPage.on("onLoadFinished", async function() {
+				let url = await phantomPage.property("url");
+				log("onLoadFinished " + url);
+				if (callbackWaiting) {
+					callbackWaiting();
+					clearTimeout(redirectTimeout);
+					callbackWaiting = false;
+				}
+				navigationRequested = false;
 			});
+
+			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
+				log("onNavigationRequested " + url);
+				navigationRequested = true;
+			});
+
+			resolve();
+
 		});
+	}
+
+	var basicAuthUsername, basicAuthPassword;
+
+	function authentication(username, password) {
+		basicAuthUsername = username;
+		basicAuthPassword = password;
 	}
 
 	function log(text) {
@@ -234,6 +242,7 @@ module.exports = function(args) {
 		choose,
 		text,
 		html,
-		query
+		query,
+		authentication
 	}
 };
