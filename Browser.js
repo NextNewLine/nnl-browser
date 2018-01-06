@@ -63,6 +63,15 @@ module.exports = function(args) {
 		});
 	}
 
+	var choose = function(selector) {
+		return new Promise(function(resolve, reject) {
+			var script = "function(){ var inputObj = document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + "\")[0];  inputObj.checked = true;return;}";
+			phantomPage.evaluateJavaScript(script).then(function() {
+				resolve();
+			});
+		});
+	}
+
 	var reload = function() {
 		return new Promise(function(resolve, reject) {
 			phantomPage.property("url").then(url => {
@@ -126,16 +135,6 @@ module.exports = function(args) {
 						callbackWaiting = false;
 					}
 				}, waitForRedirection);
-			});
-		});
-	}
-
-	// TODO don't use jQuery
-	var choose = function(selector) {
-		return new Promise(function(resolve, reject) {
-			var script = "function(){ $(\"input[name='" + selector + "'],input[value='" + selector + "'],input" + selector + "\").prop('checked',true); }";
-			phantomPage.evaluateJavaScript(script).then(function() {
-				resolve();
 			});
 		});
 	}
