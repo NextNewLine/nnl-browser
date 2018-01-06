@@ -65,7 +65,7 @@ module.exports = function(args) {
 
 	var choose = function(selector) {
 		return new Promise(function(resolve, reject) {
-			var script = "function(){ var inputObj = document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + "\")[0];  inputObj.checked = true;return;}";
+			var script = "function(){ var inputObj = document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + "\")[0]; if (inputObj) { inputObj.checked = true;return;} var inputObjs = document.querySelectorAll(\"input\"); for (var i = 0; i < inputObjs.length; i++) {if (inputObjs[i] && inputObjs[i].value=='" + selector + "') { inputObjs[i].checked = true;return;}}}";
 			phantomPage.evaluateJavaScript(script).then(function() {
 				resolve();
 			});
