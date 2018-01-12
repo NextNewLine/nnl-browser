@@ -142,7 +142,7 @@ module.exports = function(args) {
 	var text = function(selector) {
 		return new Promise(function(resolve, reject) {
 
-			var script = "function(){ if (!document.querySelectorAll(\"" + selector + "\")[0]) return ""; return document.querySelectorAll(\"" + selector + "\")[0].innerText || document.querySelectorAll(\"" + selector + "\")[0].value}";
+			var script = "function(){ if (!document.querySelectorAll(\"" + selector + "\")[0]) return ''; return document.querySelectorAll(\"" + selector + "\")[0].innerText || document.querySelectorAll(\"" + selector + "\")[0].value}";
 			if (!selector) {
 				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
