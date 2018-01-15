@@ -23,12 +23,16 @@ module.exports = function(args) {
 	var navigationRequested = false;
 	var redirectTimeout;
 
+	var currentStatus;
+	var resources = [];
+
 	var visit = function(url) {
 		log("Visiting " + url);
 		return new Promise(function(resolve, reject) {
 			createPhantom().then(function() {
 				var urlToOpen = baseUrl + url;
-				phantomPage.open(urlToOpen).then(async function(status) {
+				phantomPage.open(urlToOpen).then(async function(thisStatus) {
+					currentStatus = thisStatus;
 					await text();
 					setTimeout(function() {
 						resolve();
@@ -147,7 +151,7 @@ module.exports = function(args) {
 				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
 			phantomPage.evaluateJavaScript(script).then(text => {
-				if (text) {	
+				if (text) {
 					text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
 				}
 				resolve(text);
@@ -161,6 +165,12 @@ module.exports = function(args) {
 			phantomPage.evaluateJavaScript(script).then(html => {
 				resolve(html);
 			});
+		});
+	}
+
+	var status = function() {
+		return new Promise(function(resolve, reject) {
+			resolve(resources[0].status);
 		});
 	}
 
@@ -212,8 +222,14 @@ module.exports = function(args) {
 			});
 
 			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
+				resources = []
 				log("onNavigationRequested " + url);
 				navigationRequested = true;
+			});
+
+			phantomPage.on("onResourceReceived", function(response) {
+				if (response.stage !== "end") return;
+				resources.push(response);
 			});
 
 			resolve();
@@ -244,6 +260,7 @@ module.exports = function(args) {
 		text,
 		html,
 		query,
-		authentication
+		authentication,
+		status
 	}
 };
