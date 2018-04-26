@@ -1,4 +1,5 @@
 const phantom = require('phantom');
+const fs = require('fs');
 
 // used for Mocha tests
 process.on('unhandledRejection', function(reason) {
@@ -8,13 +9,25 @@ process.on('unhandledRejection', function(reason) {
 module.exports = function(args) {
 
 	var baseUrl = "http://localhost:3000";
+
 	var waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
+	var viewportSize = {
+		width: 600,
+		height: 961
+	}; // default to the iPhone7
+	var loadImages = false;
 
 	if (args && args.site) {
 		baseUrl = args.site;
 	}
 	if (args && args.waitForRedirection) {
 		waitForRedirection = args.waitForRedirection;
+	}
+	if (args && args.viewportSize) {
+		viewportSize = args.viewportSize;
+	}
+	if (args && args.loadImages) {
+		loadImages = args.loadImages;
 	}
 
 	var phantomPage;
@@ -30,7 +43,13 @@ module.exports = function(args) {
 		log("Visiting " + url);
 		return new Promise(function(resolve, reject) {
 			createPhantom().then(function() {
-				var urlToOpen = baseUrl + url;
+
+				var urlToOpen = url;
+
+				if (url.indexOf("://") == -1) {
+					urlToOpen = baseUrl + url;
+				}
+
 				phantomPage.open(urlToOpen).then(async function(thisStatus) {
 					currentStatus = thisStatus;
 					await text();
@@ -187,6 +206,28 @@ module.exports = function(args) {
 		});
 	};
 
+	var screenShot = function(name) {
+		return new Promise(function(resolve, reject) {
+
+			setTimeout(async () => {
+
+				const fileName = name + ".png";
+				const dir = "screenshots/";
+
+				var base64 = await phantomPage.renderBase64('PNG');
+
+				fs.existsSync(dir) || fs.mkdirSync(dir);
+
+				fs.writeFile(dir + fileName, base64, 'base64', function() {
+					resolve();
+				});
+
+			}, 2000);
+
+
+		});
+	}
+
 	var createPhantom = function() {
 
 		return new Promise(async function(resolve, reject) {
@@ -202,8 +243,15 @@ module.exports = function(args) {
 
 			phantomPage = true;
 
-			phantomInstance = await phantom.create(['--ignore-ssl-errors=yes', '--load-images=no']);
+			var options = ["--ignore-ssl-errors=yes"];
+			if (!loadImages) {
+				options.push("--load-images=no");
+			}
+
+			phantomInstance = await phantom.create(options);
+
 			phantomPage = await phantomInstance.createPage();
+			phantomPage.property("viewportSize", viewportSize);
 
 			if (basicAuthUsername && basicAuthPassword) {
 				await phantomPage.setting("userName", basicAuthUsername);
@@ -261,6 +309,7 @@ module.exports = function(args) {
 		html,
 		query,
 		authentication,
-		status
+		status,
+		screenShot
 	}
 };
