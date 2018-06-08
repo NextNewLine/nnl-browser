@@ -1,7 +1,7 @@
-const Browser = require("../Browser");
+const Browser = require("../../Browser");
 const expect = require('chai').expect;
 
-describe('Browser.html()', function() {
+describe('browser.html()', function() {
 
 	it("Returns the html on a text-only page", async function() {
 

@@ -64,7 +64,9 @@ module.exports = function(args) {
 	var reload = function() {
 		return new Promise(async function(resolve, reject) {
 			let url = await phantomPage.property("url");
-			visit(url);
+			url = url.replace(baseUrl, "");
+			await visit(url);
+			resolve();
 		});
 	}
 
@@ -95,14 +97,6 @@ module.exports = function(args) {
 		});
 	}
 
-	var reload = function() {
-		return new Promise(function(resolve, reject) {
-			phantomPage.property("url").then(url => {
-				url = url.replace(baseUrl, "");
-				visit(url).then(resolve);
-			});
-		});
-	}
 
 	/*
 		callbackWaiting to be called once the button has been pressed and the page reloads
@@ -265,7 +259,7 @@ module.exports = function(args) {
 
 			phantomPage.on("onLoadFinished", async function() {
 				let url = await phantomPage.property("url");
-				log("finished loading" + "\x1b[34m" + url);
+				log("done " + "\x1b[34m" + url);
 				if (callbackWaiting) {
 					callbackWaiting();
 					clearTimeout(redirectTimeout);
@@ -276,7 +270,7 @@ module.exports = function(args) {
 
 			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
 				resources = []
-				log("started loading " + "\x1b[34m" + url);
+				log("load " + "\x1b[34m" + url);
 				navigationRequested = true;
 			});
 

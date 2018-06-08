@@ -1,7 +1,7 @@
-const Browser = require("../Browser");
+const Browser = require("../../Browser");
 const expect = require('chai').expect;
 
-describe('Browser.clickLink()', function() {
+describe('browser.clickLink()', function() {
 
 	it("Links can be followed by their text", async function() {
 
@@ -20,7 +20,7 @@ describe('Browser.clickLink()', function() {
 		expect(await browser.text()).to.contain("Link 3");
 
 		await browser.clickLink(".classy-link");
-		
+
 		expect(await browser.text()).to.contain("Link 1");
 
 	});

@@ -1,7 +1,7 @@
-const Browser = require("../Browser");
+const Browser = require("../../Browser");
 const expect = require('chai').expect;
 
-describe('Browser.reload()', function() {
+describe('browser.reload()', function() {
 
 	it("Reload causes the page to be refreshed", async function() {
 

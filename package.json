@@ -4,8 +4,8 @@
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
-    "pretest": "pkill node; node lib/server.js & sleep 2;",
-    "test": "mocha tests/ --ui qunit --reporter list --timeout 30000 --recursive --bail --exit",
+    "pretest": "pkill node; node tests/server/server.js & sleep 2;",
+    "test": "mocha tests/integration/ --ui qunit --reporter spec --timeout 20000 --recursive --bail --exit",
     "posttest": "pkill node"
   },
   "repository": {
