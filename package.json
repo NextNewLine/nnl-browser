@@ -5,7 +5,7 @@
   "main": "Browser.js",
   "scripts": {
     "pretest": "pkill node; node lib/server.js & sleep 2;",
-    "test": "mocha tests/ --ui qunit --reporter list --timeout 30000 --recursive --exit",
+    "test": "mocha tests/ --ui qunit --reporter list --timeout 30000 --recursive --bail --exit",
     "posttest": "pkill node"
   },
   "repository": {

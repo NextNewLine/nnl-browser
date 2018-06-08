@@ -109,7 +109,7 @@ module.exports = function(args) {
 	*/
 
 	var pressButton = function(selector) {
-		log("pressButton " + selector);
+		log("pressing button '" + selector + "'");
 		return new Promise(function(resolve, reject) {
 
 			callbackWaiting = resolve;
@@ -136,18 +136,19 @@ module.exports = function(args) {
 		});
 	}
 
-	// TODO don't use jQuery
 	var clickLink = function(selector) {
-		log("clickLink started " + selector);
+		log("clicking on link '" + selector + "'");
 		return new Promise(function(resolve, reject) {
 
 			callbackWaiting = resolve;
 
-			let script = "";
-			if (selector.indexOf(".") === -1 && selector.indexOf("#") === -1) { //    var possibleButtons = document.querySelectorAll(\"button, input, a.btn\"); var buttonToClick; for (var i = 0; i < possibleButtons.length; i++) { console.debug(possibleButtons[i].innerText); if (possibleButtons[i].innerText == \"" + selector + "\"){ buttonToClick = possibleButtons;}}  if (buttonToClick){ buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1) {window.location.href = href}} else {console.log('No Link found')}
-				script = "function(){ var selector = $(\"a:contains('" + selector + "')\").first(); selector.trigger('click'); if (selector.attr('href') && selector.attr('href').length > 1&& selector.attr('href')[0] !== '#') { window.location.href = selector.attr('href');} }";
+			const selectorIsIdOrClass = selector.indexOf(".") != -1 || selector.indexOf("#") != -1;
+
+			let script;
+			if (selectorIsIdOrClass) {
+				script = "function(){ var foundLink = document.querySelectorAll(\"a" + selector + "\")[0]; if (!foundLink) return; foundLink.click(); }";
 			} else {
-				script = "function(){ var selector = $(\"" + selector + "\").first(); selector.trigger('click'); if (selector.attr('href') && selector.attr('href').length&& selector.attr('href')[0] !== '#') { window.location.href = selector.attr('href');} }";
+				script = "function(){ var aTags = document.getElementsByTagName(\"a\"); var foundLink; for (var i = 0; i < aTags.length; i++) { if (aTags[i].textContent == \"" + selector + "\") { foundLink = aTags[i]; break;}} if (!foundLink) return; foundLink.click();}";
 			}
 
 			phantomPage.evaluateJavaScript(script).then(() => {
@@ -219,7 +220,7 @@ module.exports = function(args) {
 
 				var base64 = await phantomPage.renderBase64('PNG');
 
-				log("Screenshot taken");
+				log("screenshot taken");
 
 				fs.existsSync(dir) || fs.mkdirSync(dir);
 
@@ -264,7 +265,7 @@ module.exports = function(args) {
 
 			phantomPage.on("onLoadFinished", async function() {
 				let url = await phantomPage.property("url");
-				log("onLoadFinished " + "\x1b[34m" + url);
+				log("finished loading" + "\x1b[34m" + url);
 				if (callbackWaiting) {
 					callbackWaiting();
 					clearTimeout(redirectTimeout);
@@ -275,7 +276,7 @@ module.exports = function(args) {
 
 			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
 				resources = []
-				log("onNavigationRequested " + "\x1b[34m" + url);
+				log("started loading " + "\x1b[34m" + url);
 				navigationRequested = true;
 			});
 
