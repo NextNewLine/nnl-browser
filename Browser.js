@@ -180,8 +180,11 @@ module.exports = function(args) {
 
 	var html = function() {
 		return new Promise(function(resolve, reject) {
-			var script = "function(){ return $(\"html\").html(); }";
+			var script = "function(){ return document.documentElement.outerHTML;}";
 			phantomPage.evaluateJavaScript(script).then(html => {
+				if (html) {
+					html = html.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
+				}
 				resolve(html);
 			});
 		});
@@ -301,7 +304,6 @@ module.exports = function(args) {
 		reload,
 		fill,
 		select,
-		reload,
 		pressButton,
 		clickLink,
 		choose,
