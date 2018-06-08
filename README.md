@@ -1,12 +1,12 @@
 # M14 Browser
 ### An easy to use headless browser, good for testing
 
-** M14 Browser 0.0.x ** is tested to work with Node 8 or later. 
+**M14 Browser 0.0.x** is tested to work with Node 8 or later. 
 The project is still undergoing frequent changes.
 
 ## But why
 
-The M14 Browser is a Promise based browser great for testing. It's controlled through a basic interface, which in turn injects JS into the page to control.
+The M14 Browser is a Promise based browser great for testing. It's controlled through a basic interface, which in turn injects JS into the page to control behaviour.
 
 We're (John Kershaw, M14 Industries) building it as a testing tool; you're best not using this for anything at the moment.
 
