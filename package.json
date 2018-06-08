@@ -4,7 +4,7 @@
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
-    "pretest": "node lib/server.js & sleep 2;",
+    "pretest": "pkill node; node lib/server.js & sleep 2;",
     "test": "mocha tests/ --ui qunit --reporter list --timeout 30000 --recursive --exit",
     "posttest": "pkill node"
   },
@@ -20,6 +20,8 @@
     "phantom": "4.*"
   },
   "devDependencies": {
+    "chai": "4.*",
+    "ejs": "^2.6.1",
     "express": "^4.16.3"
   },
   "author": "John Kershaw",
