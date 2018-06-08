@@ -87,10 +87,10 @@ module.exports = function(args) {
 		});
 	}
 
-	var choose = function(selector) {
+	var choose = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			var script = "function(){ var inputObj = document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + "\")[0]; if (inputObj) { inputObj.checked = true;return;} var inputObjs = document.querySelectorAll(\"input\"); for (var i = 0; i < inputObjs.length; i++) {if (inputObjs[i] && inputObjs[i].value=='" + selector + "') { inputObjs[i].checked = true;return;}}}";
+			var script = "function(){ var inputObjs = document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + "\"); if (inputObjs.length == 1) { inputObjs[0].checked = true;return;} for (var i = 0; i < inputObjs.length; i++) {if (inputObjs[i] && ((inputObjs[i].value == '" + selector + "') || (inputObjs[i].value == '" + value + "'))) { inputObjs[i].checked = true;return;}}}";
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});

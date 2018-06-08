@@ -20,6 +20,7 @@
     "phantom": "4.*"
   },
   "devDependencies": {
+    "basic-auth": "^2.0.0",
     "chai": "4.*",
     "ejs": "^2.6.1",
     "express": "^4.16.3"

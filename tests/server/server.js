@@ -14,5 +14,6 @@ require('./routes/text')(app);
 require('./routes/html')(app);
 require('./routes/status')(app);
 require('./routes/forms')(app);
+require('./routes/authentication')(app);
 
 app.listen(3000, () => console.log('Test server now listening on port 3000!'));
