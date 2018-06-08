@@ -41,23 +41,24 @@ module.exports = function(args) {
 
 	var visit = function(url) {
 		log("visiting " + "\x1b[34m" + url);
-		return new Promise(function(resolve, reject) {
-			createPhantom().then(function() {
 
-				var urlToOpen = url;
+		return new Promise(async function(resolve, reject) {
+			
+			await createPhantom();
 
-				if (url.indexOf("://") == -1) {
-					urlToOpen = baseUrl + url;
-				}
+			var urlToOpen = url;
 
-				phantomPage.open(urlToOpen).then(async function(thisStatus) {
-					currentStatus = thisStatus;
-					await text();
-					setTimeout(function() {
-						resolve();
-					}, 100);
-				});
-			});
+			if (url.indexOf("://") == -1) {
+				urlToOpen = baseUrl + url;
+			}
+
+			const thisStatus = await phantomPage.open(urlToOpen);
+			currentStatus = thisStatus;
+			await text();
+
+			setTimeout(function() {
+				resolve();
+			}, 100);
 		});
 	}
 
@@ -71,32 +72,31 @@ module.exports = function(args) {
 	}
 
 	var fill = function(selector, value) {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
+
 			var script = "function(){ document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + ",textarea[name='" + selector + "'],textarea" + selector + "\")[0].value = '" + value + "'; }";
-			phantomPage.evaluateJavaScript(script).then(html => {
-				resolve();
-			});
+			await phantomPage.evaluateJavaScript(script);
+			resolve();
 		});
 	}
 
 	var select = function(selector, value) {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
+
 			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) {if (selectObj.options && selectObj.options[i] && selectObj.options[i].text=='" + value + "') { selectObj.options[i].selected = true;return;}}}";
-			phantomPage.evaluateJavaScript(script).then(html => {
-				resolve();
-			});
+			await phantomPage.evaluateJavaScript(script);
+			resolve();
 		});
 	}
 
 	var choose = function(selector) {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
+
 			var script = "function(){ var inputObj = document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + "\")[0]; if (inputObj) { inputObj.checked = true;return;} var inputObjs = document.querySelectorAll(\"input\"); for (var i = 0; i < inputObjs.length; i++) {if (inputObjs[i] && inputObjs[i].value=='" + selector + "') { inputObjs[i].checked = true;return;}}}";
-			phantomPage.evaluateJavaScript(script).then(function() {
-				resolve();
-			});
+			await phantomPage.evaluateJavaScript(script);
+			resolve();
 		});
 	}
-
 
 	/*
 		callbackWaiting to be called once the button has been pressed and the page reloads
@@ -104,7 +104,7 @@ module.exports = function(args) {
 
 	var pressButton = function(selector) {
 		log("pressing button '" + selector + "'");
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 
 			callbackWaiting = resolve;
 
@@ -115,24 +115,24 @@ module.exports = function(args) {
 				script = "function(){ var debug; var buttonToClick = document.querySelectorAll(\"button" + selector + ", input" + selector + ", a.btn" + selector + "\")[0]; buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1 && href[0] !== '#') {window.location.href = href}}";
 			}
 
-			phantomPage.evaluateJavaScript(script).then((text) => {
-				if (text) {
-					log("Error " + text);
+			const error = await phantomPage.evaluateJavaScript(script);
+			if (error) {
+				log("Error " + error);
+			}
+
+			redirectTimeout = setTimeout(() => {
+				if (!navigationRequested && callbackWaiting) {
+					log("pressButton complete (within pressButton) no navigationRequested" + selector);
+					callbackWaiting();
+					callbackWaiting = false;
 				}
-				redirectTimeout = setTimeout(() => {
-					if (!navigationRequested && callbackWaiting) {
-						log("pressButton complete (within pressButton) no navigationRequested" + selector);
-						callbackWaiting();
-						callbackWaiting = false;
-					}
-				}, waitForRedirection);
-			});
+			}, waitForRedirection);
 		});
 	}
 
 	var clickLink = function(selector) {
 		log("clicking on link '" + selector + "'");
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 
 			callbackWaiting = resolve;
 
@@ -145,43 +145,44 @@ module.exports = function(args) {
 				script = "function(){ var aTags = document.getElementsByTagName(\"a\"); var foundLink; for (var i = 0; i < aTags.length; i++) { if (aTags[i].textContent == \"" + selector + "\") { foundLink = aTags[i]; break;}} if (!foundLink) return; foundLink.click();}";
 			}
 
-			phantomPage.evaluateJavaScript(script).then(() => {
-				redirectTimeout = setTimeout(() => {
-					if (!navigationRequested && callbackWaiting) {
-						log("clickLink complete (within clickLink) no navigationRequested" + selector);
-						callbackWaiting();
-						callbackWaiting = false;
-					}
-				}, waitForRedirection);
-			});
+			await phantomPage.evaluateJavaScript(script);
+			redirectTimeout = setTimeout(() => {
+				if (!navigationRequested && callbackWaiting) {
+					log("clickLink complete (within clickLink) no navigationRequested" + selector);
+					callbackWaiting();
+					callbackWaiting = false;
+				}
+			}, waitForRedirection);
 		});
 	}
 
 	var text = function(selector) {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 
 			var script = "function(){ if (!document.querySelectorAll(\"" + selector + "\")[0]) return ''; var text = \"\"; for (var i = 0; i < document.querySelectorAll(\"" + selector + "\").length; i++){ text += \" \" + (document.querySelectorAll(\"" + selector + "\")[i].innerText || document.querySelectorAll(\"" + selector + "\")[i].value)}; return text;}";
 			if (!selector) {
 				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText = \"\"; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
 			}
-			phantomPage.evaluateJavaScript(script).then(text => {
-				if (text) {
-					text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
-				}
-				resolve(text);
-			});
+
+			let text = await phantomPage.evaluateJavaScript(script);
+			if (text) {
+				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
+			}
+			resolve(text);
 		});
 	}
 
 	var html = function() {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
+
 			var script = "function(){ return document.documentElement.outerHTML;}";
-			phantomPage.evaluateJavaScript(script).then(html => {
-				if (html) {
-					html = html.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
-				}
-				resolve(html);
-			});
+
+			let html = await phantomPage.evaluateJavaScript(script);
+			if (html) {
+				html = html.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
+			}
+			resolve(html);
+
 		});
 	}
 
@@ -192,15 +193,16 @@ module.exports = function(args) {
 	}
 
 	var query = function(selector) {
-		return new Promise(function(resolve, reject) {
-			var script = "function(){ return document.querySelectorAll(\"" + selector + "\").length !== 0; }";
-			phantomPage.evaluateJavaScript(script).then(result => {
-				if (result) {
-					resolve(result);
-				} else {
-					resolve();
-				}
-			});
+		return new Promise(async function(resolve, reject) {
+
+			const script = "function(){ return document.querySelectorAll(\"" + selector + "\").length !== 0; }";
+
+			const result = await phantomPage.evaluateJavaScript(script);
+			if (result) {
+				return resolve(true);
+			}
+			resolve(undefined);
+
 		});
 	};
 
