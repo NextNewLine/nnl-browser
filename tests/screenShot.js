@@ -1,4 +1,3 @@
-const expect = require('chai').expect;
 const Browser = require("../Browser");
 
 describe('Browser screen shot', function() {

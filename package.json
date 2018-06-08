@@ -1,10 +1,12 @@
 {
   "name": "m14-browser",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
-    "test": "mocha tests/ --ui qunit --reporter list --timeout 30000 --recursive --exit"
+    "pretest": "node lib/server.js & sleep 2;",
+    "test": "mocha tests/ --ui qunit --reporter list --timeout 30000 --recursive --exit",
+    "posttest": "pkill node"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,7 @@
     "phantom": "4.*"
   },
   "devDependencies": {
-    "chai": "*"
+    "express": "^4.16.3"
   },
   "author": "John Kershaw",
   "license": "MIT",
