@@ -36,14 +36,13 @@ module.exports = function(args) {
 	var navigationRequested = false;
 	var redirectTimeout;
 
-	var currentStatus;
 	var resources = [];
 
 	var visit = function(url) {
 		log("visiting " + "\x1b[34m" + url);
 
 		return new Promise(async function(resolve, reject) {
-			
+
 			await createPhantom();
 
 			var urlToOpen = url;
@@ -52,8 +51,7 @@ module.exports = function(args) {
 				urlToOpen = baseUrl + url;
 			}
 
-			const thisStatus = await phantomPage.open(urlToOpen);
-			currentStatus = thisStatus;
+			await phantomPage.open(urlToOpen);
 			await text();
 
 			setTimeout(function() {
@@ -188,7 +186,7 @@ module.exports = function(args) {
 
 	var status = function() {
 		return new Promise(function(resolve, reject) {
-			resolve(resources[0].status);
+			resolve(resources[resources.length - 1].status);
 		});
 	}
 
@@ -260,8 +258,11 @@ module.exports = function(args) {
 			}
 
 			phantomPage.on("onLoadFinished", async function() {
+
 				let url = await phantomPage.property("url");
+
 				log("done " + "\x1b[34m" + url);
+
 				if (callbackWaiting) {
 					callbackWaiting();
 					clearTimeout(redirectTimeout);
@@ -271,8 +272,8 @@ module.exports = function(args) {
 			});
 
 			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
-				resources = []
 				log("load " + "\x1b[34m" + url);
+				resources = [];
 				navigationRequested = true;
 			});
 

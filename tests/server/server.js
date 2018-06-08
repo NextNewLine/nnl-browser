@@ -7,5 +7,6 @@ app.set('views', path.join(__dirname, '/views'));
 
 require('./routes/text')(app);
 require('./routes/html')(app);
+require('./routes/status')(app);
 
 app.listen(3000, () => console.log('Test server now listening on port 3000!'));
