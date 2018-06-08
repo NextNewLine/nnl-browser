@@ -40,7 +40,7 @@ module.exports = function(args) {
 	var resources = [];
 
 	var visit = function(url) {
-		log("Visiting " + url);
+		log("visiting " + "\x1b[34m" + url);
 		return new Promise(function(resolve, reject) {
 			createPhantom().then(function() {
 
@@ -219,6 +219,8 @@ module.exports = function(args) {
 
 				var base64 = await phantomPage.renderBase64('PNG');
 
+				log("Screenshot taken");
+
 				fs.existsSync(dir) || fs.mkdirSync(dir);
 
 				fs.writeFile(dir + fileName, base64, 'base64', function() {
@@ -226,7 +228,6 @@ module.exports = function(args) {
 				});
 
 			}, 2000);
-
 
 		});
 	}
@@ -263,7 +264,7 @@ module.exports = function(args) {
 
 			phantomPage.on("onLoadFinished", async function() {
 				let url = await phantomPage.property("url");
-				log("onLoadFinished " + url);
+				log("onLoadFinished " + "\x1b[34m" + url);
 				if (callbackWaiting) {
 					callbackWaiting();
 					clearTimeout(redirectTimeout);
@@ -274,7 +275,7 @@ module.exports = function(args) {
 
 			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
 				resources = []
-				log("onNavigationRequested " + url);
+				log("onNavigationRequested " + "\x1b[34m" + url);
 				navigationRequested = true;
 			});
 
@@ -296,7 +297,7 @@ module.exports = function(args) {
 	}
 
 	function log(text) {
-		console.log("Phantom", text, "\x1b[0m");
+		console.log("\x1b[32m " + "Browser" + "\x1b[0m " + text + "\x1b[0m");
 	}
 
 	return {
