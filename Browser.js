@@ -72,7 +72,7 @@ module.exports = function(args) {
 	var fill = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			var script = "function(){ document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + ",textarea[name='" + selector + "'],textarea" + selector + "\")[0].value = '" + value + "'; }";
+			const script = await getScript("fill", selector, value);
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});
@@ -81,7 +81,7 @@ module.exports = function(args) {
 	var select = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) { if (selectObj.options && selectObj.options[i] && ((selectObj.options[i].text=='" + value + "') || (selectObj.options[i].value=='" + value + "'))) { selectObj.options[i].selected = true;return;}}}";
+			const script = await getScript("select", selector, value);
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});
@@ -90,7 +90,7 @@ module.exports = function(args) {
 	var choose = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			var script = "function(){ var inputObjs = document.querySelectorAll(\"input[name='" + selector + "'],input" + selector + "\"); if (inputObjs.length == 1) { inputObjs[0].checked = true;return;} for (var i = 0; i < inputObjs.length; i++) {if (inputObjs[i] && ((inputObjs[i].value == '" + selector + "') || (inputObjs[i].value == '" + value + "'))) { inputObjs[i].checked = true;return;}}}";
+			const script = await getScript("choose", selector, value);
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});
@@ -106,13 +106,7 @@ module.exports = function(args) {
 
 			callbackWaiting = resolve;
 
-			let script = "";
-			if (selector.indexOf(".") === -1 && selector.indexOf("#") === -1) {
-				script = "function(){ var debug; var possibleButtons = document.querySelectorAll(\"button, input, a.btn\"); var buttonToClick; for (var i = 0; i < possibleButtons.length; i++) { if (possibleButtons[i].innerText.indexOf('" + selector + "') !== -1){buttonToClick = possibleButtons[i]};} if(!buttonToClick){ return 'No button found for " + selector + "'; } buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1) {window.location.href = href}}";
-			} else {
-				script = "function(){ var debug; var buttonToClick = document.querySelectorAll(\"button" + selector + ", input" + selector + ", a.btn" + selector + "\")[0]; buttonToClick.click(); var href = buttonToClick.getAttribute('href'); if (href && href.length > 1 && href[0] !== '#') {window.location.href = href}}";
-			}
-
+			const script = await getScript("pressButton", selector);
 			const error = await phantomPage.evaluateJavaScript(script);
 			if (error) {
 				log("Error " + error);
@@ -134,16 +128,9 @@ module.exports = function(args) {
 
 			callbackWaiting = resolve;
 
-			const selectorIsIdOrClass = selector.indexOf(".") != -1 || selector.indexOf("#") != -1;
-
-			let script;
-			if (selectorIsIdOrClass) {
-				script = "function(){ var foundLink = document.querySelectorAll(\"a" + selector + "\")[0]; if (!foundLink) return; foundLink.click(); }";
-			} else {
-				script = "function(){ var aTags = document.getElementsByTagName(\"a\"); var foundLink; for (var i = 0; i < aTags.length; i++) { if (aTags[i].textContent == \"" + selector + "\") { foundLink = aTags[i]; break;}} if (!foundLink) return; foundLink.click();}";
-			}
-
+			const script = await getScript("clickLink", selector);
 			await phantomPage.evaluateJavaScript(script);
+
 			redirectTimeout = setTimeout(() => {
 				if (!navigationRequested && callbackWaiting) {
 					log("clickLink complete (within clickLink) no navigationRequested" + selector);
@@ -157,12 +144,9 @@ module.exports = function(args) {
 	var text = function(selector) {
 		return new Promise(async function(resolve, reject) {
 
-			var script = "function(){ if (!document.querySelectorAll(\"" + selector + "\")[0]) return ''; var text = \"\"; for (var i = 0; i < document.querySelectorAll(\"" + selector + "\").length; i++){ text += \" \" + (document.querySelectorAll(\"" + selector + "\")[i].innerText || document.querySelectorAll(\"" + selector + "\")[i].value)}; return text;}";
-			if (!selector) {
-				script = "function(){ var pageText = document.querySelectorAll(\"body\")[0].innerText; var inputText = \"\"; var inputs = document.querySelectorAll(\"input,textarea\"); for (var i = 0; i < inputs.length; i++){inputText += \" \" + inputs[i].value}; return pageText + inputText}";
-			}
-
+			const script = await getScript("text", selector);
 			let text = await phantomPage.evaluateJavaScript(script);
+
 			if (text) {
 				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
 			}
@@ -173,9 +157,9 @@ module.exports = function(args) {
 	var html = function() {
 		return new Promise(async function(resolve, reject) {
 
-			var script = "function(){ return document.documentElement.outerHTML;}";
-
+			const script = await getScript("html");
 			let html = await phantomPage.evaluateJavaScript(script);
+
 			if (html) {
 				html = html.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
 			}
@@ -193,9 +177,9 @@ module.exports = function(args) {
 	var query = function(selector) {
 		return new Promise(async function(resolve, reject) {
 
-			const script = "function(){ return document.querySelectorAll(\"" + selector + "\").length !== 0; }";
-
+			const script = await getScript("query", selector);
 			const result = await phantomPage.evaluateJavaScript(script);
+
 			if (result) {
 				return resolve(true);
 			}
@@ -296,6 +280,181 @@ module.exports = function(args) {
 
 	function log(text) {
 		console.log("\x1b[32m " + "Browser" + "\x1b[0m " + text + "\x1b[0m");
+	}
+
+	function getScript(name, selector, value) {
+		return new Promise(resolve => {
+
+			let script;
+
+			if (name == "html") {
+				script = `
+				function(){ 
+					return document.documentElement.outerHTML;
+				}`;
+			}
+
+			if (name == "query") {
+				script = `
+				function(){ 
+					return document.querySelectorAll("${selector}").length !== 0; 
+				}`;
+			}
+
+			if (name == "fill") {
+				script = `
+				function(){ 
+					document.querySelectorAll("input[name='${selector}'],input${selector},textarea[name='${selector}'],textarea${selector}")[0].value = '${value}'; 
+				}`;
+			}
+
+			if (name == "select") {
+				script = `
+				function(){ 
+					var selectObj = document.querySelectorAll("select[name='${selector}'],select${selector}")[0];
+					
+					for (var i = 0; i < selectObj.options.length; i++) { 
+						if (selectObj.options && selectObj.options[i] && ((selectObj.options[i].text == '${value}') || (selectObj.options[i].value == '${value}'))) { 
+							selectObj.options[i].selected = true;
+							return;
+						}
+					}
+				}`;
+			}
+
+			if (name == "choose") {
+				script = `
+				function(){ 
+					var inputObjs = document.querySelectorAll("input[name='${selector}'],input${selector}"); 
+
+					if (inputObjs.length == 1) { 
+						inputObjs[0].checked = true;
+						return;
+					} 
+
+					for (var i = 0; i < inputObjs.length; i++) {
+						if (inputObjs[i] && ((inputObjs[i].value == '${selector}') || (inputObjs[i].value == '${value}'))) { 
+							inputObjs[i].checked = true;
+							return;
+						}
+					}
+				}`;
+
+			}
+
+			if (name == "text") {
+				script = `
+				function(){ 
+
+					var pageText = document.querySelectorAll("body")[0].innerText; 
+					var inputs = document.querySelectorAll("input,textarea"); 
+
+					var inputText = ""; 
+					for (var i = 0; i < inputs.length; i++) {
+						inputText += " " + inputs[i].value
+					}; 
+
+					return pageText + inputText
+				}`;
+
+				if (selector) {
+					script = `
+					function(){ 
+						if (!document.querySelectorAll("${selector}")[0]) {
+							return ''; 
+						}
+
+						var text = ""; 
+						for (var i = 0; i < document.querySelectorAll("${selector}").length; i++) { 
+							text += " " + (document.querySelectorAll("${selector}")[i].value || document.querySelectorAll("${selector}")[i].innerText)
+						}; 
+						return text;
+					}`;
+				}
+			}
+
+			if (name == "pressButton") {
+
+				if (selector.indexOf(".") === -1 && selector.indexOf("#") === -1) {
+					script = `
+					function(){ 
+						var possibleButtons = document.querySelectorAll("button, input, a.btn"); 
+						var buttonToClick; 
+
+						for (var i = 0; i < possibleButtons.length; i++) { 
+							if (possibleButtons[i].innerText.indexOf('${selector}') !== -1) {
+								buttonToClick = possibleButtons[i]
+							};
+						} 
+
+						if(!buttonToClick) { 
+							return "No button found for ${selector}"; 
+						} 
+
+						buttonToClick.click(); 
+
+						var href = buttonToClick.getAttribute('href'); 
+						if (href && href.length > 1) {
+							window.location.href = href;
+						}
+					}`;
+
+				} else {
+					script = `
+					function(){ 
+						var debug; 
+						var buttonToClick = document.querySelectorAll("button${selector}, input${selector}, a.btn${selector}")[0]; 
+
+						buttonToClick.click();
+
+						var href = buttonToClick.getAttribute('href'); 
+						if (href && href.length > 1 && href[0] !== '#') {
+							window.location.href = href
+						}
+					}`;
+				}
+			}
+
+			if (name == "clickLink") {
+
+				const selectorIsIdOrClass = selector.indexOf(".") != -1 || selector.indexOf("#") != -1;
+
+				if (selectorIsIdOrClass) {
+					script = `
+					function(){ 
+						var foundLink = document.querySelectorAll("a${selector}")[0];
+
+						if (!foundLink) {
+							return;
+						} 
+
+						foundLink.click(); 
+					}`;
+				} else {
+					script = `
+					function(){ 
+						var aTags = document.getElementsByTagName("a"); 
+
+						var foundLink; 
+						for (var i = 0; i < aTags.length; i++) { 
+							if (aTags[i].textContent ==  "${selector}") { 
+								foundLink = aTags[i]; 
+								break;
+							}
+						} 
+
+						if (!foundLink) {
+							return;
+						}
+
+						foundLink.click();
+					}`;
+				}
+
+			}
+
+			resolve(script);
+		});
 	}
 
 	return {
