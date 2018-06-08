@@ -81,7 +81,7 @@ module.exports = function(args) {
 	var select = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) {if (selectObj.options && selectObj.options[i] && selectObj.options[i].text=='" + value + "') { selectObj.options[i].selected = true;return;}}}";
+			var script = "function(){ var selectObj = document.querySelectorAll(\"select[name='" + selector + "'],select" + selector + "\")[0];  for (var i = 0; i < selectObj.options.length; i++) { if (selectObj.options && selectObj.options[i] && ((selectObj.options[i].text=='" + value + "') || (selectObj.options[i].value=='" + value + "'))) { selectObj.options[i].selected = true;return;}}}";
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});
