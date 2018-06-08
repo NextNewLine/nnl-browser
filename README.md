@@ -19,26 +19,26 @@ const expect = require('chai').expect;
 
 describe('Given we view the forms1 page', function() {
 
-	const browser = new Browser();
+  const browser = new Browser();
     
-	it("We can fill in the values and submit the form", async function() {
+  it("We can fill in the values and submit the form", async function() {
 
-		await browser.visit("/forms1");
+    await browser.visit("/forms1");
 
-		await browser.fill("forumInput", "Forms4Life");
-		await browser.fill("formTextArea", "Textareasaremylife");
-		await browser.select("#favouriteCat", "Russian Blue");
-		await browser.choose(".favouritePlant", "spiderplant");
-		await browser.pressButton("#forumSubmitButton");
+    await browser.fill("forumInput", "Forms4Life");
+    await browser.fill("formTextArea", "Textareasaremylife");
+    await browser.select("#favouriteCat", "Russian Blue");
+    await browser.choose(".favouritePlant", "spiderplant");
+    await browser.pressButton("#forumSubmitButton");
     
-		await browser.screenshot("myScreenshot");
+    await browser.screenshot("myScreenshot");
 
-		expect(await browser.text("#formResults")).to.contain("Forms4Life");
-		expect(await browser.text("#formResults")).to.contain("Textareasaremylife");
-		expect(await browser.text("#formResults")).to.contain("russianblue");
-		expect(await browser.text("#formResults")).to.contain("spiderplant");
-
-	});
+    expect(await browser.text("#formResults")).to.contain("Forms4Life");
+    expect(await browser.text("#formResults")).to.contain("Textareasaremylife");
+    expect(await browser.text("#formResults")).to.contain("russianblue");
+    expect(await browser.text("#formResults")).to.contain("spiderplant");
+    
+  });
 });
 ```
 ## Browser
@@ -77,11 +77,11 @@ Return the readable text. Approximatly, this is what the user sees.
 
 #### `browser.html(selector)`
 
-Return the html. if no selector is given, returns the whole page.
+Return the html. If no selector is given, returns the whole page.
 
 #### `browser.query(selector)`
 
-Does an element exist? Returns `true` or `false`
+Does an element exist? Returns `true` or `false`.
 
 #### `browser.authentication(username, password)`
 
