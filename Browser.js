@@ -13,7 +13,7 @@ module.exports = function(args) {
 
 	var baseUrl = "http://localhost:3000";
 
-	var waitForRedirection = 200; // how long to wait for a redirection after a button or link has been clicked?
+	var waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
 	var viewportSize = {
 		width: 600,
 		height: 961
@@ -262,19 +262,27 @@ module.exports = function(args) {
 
 				log("done " + "\x1b[34m" + url);
 
-				if (callbackWaiting) {
+				if (await pendingAjax() > 0) {
+					log("waiting for all pending ajax calls to complete");
+					await waitForAjaxToFinish();
+				}
+
+				// The page has loaded, we've waited for all the ajax stuff to complete. We can go ahead and say the page is loaded
+				if (callbackWaiting && redirectTimeout) {
 					callbackWaiting();
 					clearTimeout(redirectTimeout);
+					redirectTimeout = false;
 					callbackWaiting = false;
 				}
 				navigationRequested = false;
 			});
 
-			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
+			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {	
 				
 				// handle either the old, or new,or both links being #something
 				if (resources.length > 0 && (resources[0].url.indexOf('#') > 0 || url.indexOf('#') > 0)) {
 					if (resources[0].url.substring(0, resources[0].url.indexOf('#')) == url.substring(0, url.indexOf('#'))) {
+
 						return;
 					}
 				}
