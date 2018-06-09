@@ -43,7 +43,7 @@
               forumInputOne: document.getElementById("forumInputId").value,
               formTextArea: document.getElementById("formTextAreaId").value,
               catlist: document.getElementById("CatListId").value,
-              favePlant: document.querySelector("[name=favePlant]:checked").value
+              favePlant: document.querySelector("[name=favePlant]:checked") ? document.querySelector("[name=favePlant]:checked").value : undefined
             };
 
             $.post("/ajaxFormEndpoint800", data, function(results) {

@@ -293,10 +293,6 @@ module.exports = function(args) {
 		basicAuthPassword = password;
 	}
 
-	function log(text) {
-		console.log("\x1b[32m " + "Browser" + "\x1b[0m " + text + "\x1b[0m");
-	}
-
 	return {
 		visit,
 		reload,
@@ -313,3 +309,7 @@ module.exports = function(args) {
 		screenShot
 	}
 };
+
+function log(text) {
+	console.log("\x1b[32m " + "Browser" + "\x1b[0m " + text + "\x1b[0m");
+}

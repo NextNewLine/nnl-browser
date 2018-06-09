@@ -13,6 +13,7 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.pressButto
 		await browser.fill("formTextArea", "Textareasaremylife");
 		await browser.select("catlist", "Russian Blue");
 		await browser.choose("favePlant", "other");
+		
 		await browser.pressButton("#forumSubmitButton");
 
 		expect(await browser.text("#formResults")).to.contain("Forms4Life");
@@ -32,6 +33,7 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.pressButto
 		await browser.fill("#formTextAreaId", "Woooooooo");
 		await browser.select("#CatListId", "siamese");
 		await browser.choose("#favePlant2");
+
 		await browser.pressButton("#forumSubmitButton");
 
 		expect(await browser.text("#formResults")).to.contain("CatsCatsCats");
@@ -50,13 +52,14 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.pressButto
 		await browser.fill("#forumInputId", "CatsCatsCats");
 		await browser.fill("#formTextAreaId", "Woooooooo");
 		await browser.select("#CatListId", "siamese");
-		await browser.choose("#favePlant2");
+		await browser.choose("other");
+
 		await browser.pressButton("#forumSubmitButton");
 
 		expect(await browser.text("#formResults")).to.contain("CatsCatsCats");
 		expect(await browser.text("#formResults")).to.contain("Woooooooo");
 		expect(await browser.text("#formResults")).to.contain("siamese");
-		expect(await browser.text("#formResults")).to.contain("bostonfern");
+		expect(await browser.text("#formResults")).to.contain("other");
 
 	});
 });
