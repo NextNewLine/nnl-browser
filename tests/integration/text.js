@@ -51,4 +51,15 @@ describe('browser.text()', function() {
 		expect(await browser.text(".paragraphOfInterest")).to.contain("And here is a paragraph with the same class as the secondParagraph");
 
 	});
+
+	it("Waits for jQuery ajax requests to complete before checking", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/htmlajax");
+
+		expect(await browser.text("#secondParagraph")).to.contain("100ms here!");
+		expect(await browser.text("#thirdParagraph")).to.contain("800ms here!");
+
+	});
 });

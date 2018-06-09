@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test page</title>
+        <script
+          src="https://code.jquery.com/jquery-3.3.1.js"
+          integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+          crossorigin="anonymous"></script>  
+    </head>
+
+    <body>
+        <h1>
+            Testing ajax pages
+        </h1>
+        <p>
+            First paragraph, always here
+        </p>
+        <p id="secondParagraph">
+        </p>
+        <p id="thirdParagraph">
+        </p>
+
+        <script type="text/javascript">
+
+            $.get("/ajaxEndpoint100", function() {
+                document.getElementById("secondParagraph").innerHTML = "100ms here!"
+            });
+
+            $.get("/ajaxEndpoint800", function() {
+                document.getElementById("thirdParagraph").innerHTML = "800ms here!"
+            });
+            
+        </script>
+    </body>
+</html>

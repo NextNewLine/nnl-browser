@@ -6,4 +6,10 @@ module.exports = function(app) {
 		}, 800);
 	});
 
+	app.get('/ajaxEndpoint100', function(req, res) {
+		setTimeout(function() {
+			res.sendStatus(200);
+		}, 100);
+	});
+
 }

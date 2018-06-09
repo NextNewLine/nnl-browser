@@ -2,6 +2,7 @@ const phantom = require('phantom');
 const fs = require('fs');
 
 const Scripts = require('./lib/Scripts');
+const TwirlTimer = require('./lib/TwirlTimer');
 
 // used for Mocha tests
 process.on('unhandledRejection', function(reason) {
@@ -12,7 +13,7 @@ module.exports = function(args) {
 
 	var baseUrl = "http://localhost:3000";
 
-	var waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
+	var waitForRedirection = 200; // how long to wait for a redirection after a button or link has been clicked?
 	var viewportSize = {
 		width: 600,
 		height: 961
@@ -54,12 +55,27 @@ module.exports = function(args) {
 			}
 
 			await phantomPage.open(urlToOpen);
-			await text();
+			await waitForAjaxToFinish();
 
-			setTimeout(function() {
-				resolve();
-			}, 100);
+			resolve();
+
 		});
+	}
+
+	var waitForAjaxToFinish = function() {
+		return new Promise(async function(resolve) {
+
+			var myInterval = setInterval(async function() {
+				if (await pendingAjax() === 0) {
+					clearInterval(myInterval);
+					TwirlTimer.stop();
+					return resolve();
+				}
+				TwirlTimer.start();
+			}, 50);
+
+		});
+
 	}
 
 	var reload = function() {
@@ -191,24 +207,20 @@ module.exports = function(args) {
 	};
 
 	var screenShot = function(name) {
-		return new Promise(function(resolve, reject) {
+		return new Promise(async function(resolve, reject) {
 
-			setTimeout(async () => {
+			const fileName = name + ".png";
+			const dir = "screenshots/";
 
-				const fileName = name + ".png";
-				const dir = "screenshots/";
+			var base64 = await phantomPage.renderBase64('PNG');
 
-				var base64 = await phantomPage.renderBase64('PNG');
+			log("screenshot taken");
 
-				log("screenshot taken");
+			fs.existsSync(dir) || fs.mkdirSync(dir);
 
-				fs.existsSync(dir) || fs.mkdirSync(dir);
-
-				fs.writeFile(dir + fileName, base64, 'base64', function() {
-					resolve();
-				});
-
-			}, 2000);
+			fs.writeFile(dir + fileName, base64, 'base64', function() {
+				resolve();
+			});
 
 		});
 	}

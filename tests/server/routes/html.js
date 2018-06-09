@@ -4,6 +4,10 @@ module.exports = function(app) {
 		res.render("htmlsimple");
 	});
 
+	app.get('/htmlajax', function(req, res) {
+		res.render("htmlajax");
+	});
+
 	app.get('/link1', function(req, res) {
 		res.render("link1");
 	});
