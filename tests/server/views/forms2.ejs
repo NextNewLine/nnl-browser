@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test page</title>
+        <script
+          src="https://code.jquery.com/jquery-3.3.1.js"
+          integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+          crossorigin="anonymous"></script>    
+    </head>
+
+    <body>
+        <h1>
+            I love forms!
+        </h1>
+       <form action="/post" method="post">
+
+            <input type="text" name="forumInputOne" id="forumInputId"><br />
+
+            <textarea name="formTextArea" id="formTextAreaId"></textarea><br />
+
+            <select name="catlist" id="CatListId">
+              <option value="persian">Persian</option>
+              <option value="siamese">Siamese</option>
+              <option value="ragdoll">Ragdoll</option>
+              <option value="russianblue">Russian Blue</option>
+              <option value="mainecoon">Maine Coon</option>
+            </select><br />
+
+            <input type="radio" name="favePlant" id="favePlant1" value="ficusalii"> Ficus alii<br />
+            <input type="radio" name="favePlant" id="favePlant2" value="bostonfern"> Boston Fern<br />
+            <input type="radio" name="favePlant" id="favePlant3" value="other"> Other<br />
+
+           <button type="submit" id="forumSubmitButton" onclick="submitform(event);">Submit</button>
+       </form>
+
+       <p id="formResults"></p>
+
+       <script type="text/javascript">
+         function submitform(event) {
+            event.preventDefault();
+
+            var data = {
+              forumInputOne: document.getElementById("forumInputId").value,
+              formTextArea: document.getElementById("formTextAreaId").value,
+              catlist: document.getElementById("CatListId").value,
+              favePlant: document.querySelector("[name=favePlant]:checked").value
+            };
+
+            $.post("/ajaxFormEndpoint800", data, function(results) {
+              document.getElementById("formResults").innerHTML = JSON.stringify(results);
+            });
+         }
+       </script>
+    </body>
+</html>

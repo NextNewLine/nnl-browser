@@ -12,4 +12,10 @@ module.exports = function(app) {
 		}, 100);
 	});
 
+
+	app.post('/ajaxFormEndpoint800', function(req, res) {
+		setTimeout(function() {
+			res.send(req.body);
+		}, 800);
+	});
 }

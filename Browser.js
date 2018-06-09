@@ -138,13 +138,14 @@ module.exports = function(args) {
 			redirectTimeout = setTimeout(async () => {
 				if (!navigationRequested && callbackWaiting) {
 
-					if (await pendingAjax() == 0) {
-						log(command + " complete (within clickElement) no navigationRequested" + selector);
-						callbackWaiting();
-						callbackWaiting = false;
-					} else {
-						log(command + " waiting for all pending ajax calls to complete");
+					if (await pendingAjax() > 0) {
+						log(command + " waiting for all pending ajax calls to complete " + selector);
+						await waitForAjaxToFinish();
 					}
+
+					log(command + " complete (within clickElement) no navigationRequested " + selector);
+					callbackWaiting();
+					callbackWaiting = false;
 				}
 			}, waitForRedirection);
 		});

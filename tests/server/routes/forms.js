@@ -4,6 +4,10 @@ module.exports = function(app) {
 		res.render("forms1");
 	});
 
+	app.get('/forms2', function(req, res) {
+		res.render("forms2");
+	});
+
 	app.post('/post', function(req, res) {
 
 		const model = {
@@ -12,4 +16,5 @@ module.exports = function(app) {
 
 		res.render("post", model);
 	});
+
 }
