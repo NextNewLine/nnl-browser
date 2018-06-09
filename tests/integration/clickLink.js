@@ -27,7 +27,9 @@ describe('browser.clickLink()', function() {
 
 	it("Links which have a delay before they change page will work.", async function() {
 
-		const browser = new Browser();
+		const browser = new Browser({
+			waitForRedirection: 400
+		});
 
 		await browser.visit("/link4");		
 		await browser.clickLink("Hats for all");
@@ -64,6 +66,16 @@ describe('browser.clickLink()', function() {
 		await browser.visit("/link5");		
 		await browser.clickLink("Love it!");
 		expect(await browser.text()).to.contain("Link 6");
+
+	});
+
+	it("We can follow a complex link selector", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/link1");		
+		await browser.clickLink("div[data-cat='meow'] .catclass a");
+		expect(await browser.text()).to.contain("Link 2");
 
 	});
 
