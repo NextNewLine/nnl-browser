@@ -271,6 +271,14 @@ module.exports = function(args) {
 			});
 
 			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {
+				
+				// handle either the old, or new,or both links being #something
+				if (resources.length > 0 && (resources[0].url.indexOf('#') > 0 || url.indexOf('#') > 0)) {
+					if (resources[0].url.substring(0, resources[0].url.indexOf('#')) == url.substring(0, url.indexOf('#'))) {
+						return;
+					}
+				}
+
 				log("load " + "\x1b[34m" + url);
 				resources = [];
 				navigationRequested = true;
