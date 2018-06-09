@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test page</title>
+        <script
+          src="https://code.jquery.com/jquery-3.3.1.js"
+          integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+          crossorigin="anonymous"></script>         
+    </head>
+
+    <body>
+        <h1>
+            Link 5
+        </h1>
+        <p>
+            This link makes an ajax call which lasts for 800ms, then redirects the user. <a onclick="clickLink(event);">Love it!</a>
+        </p>
+
+        <span id="readyState"></span>
+        <script type="text/javascript">
+            setInterval(function(){
+                document.getElementById("readyState").innerHTML = "readyState: " + document.readyState + "<br /> jquery " + ($ ? $.active : "no $");
+            }, 100);
+        </script>
+
+        <script type="text/javascript">
+            function clickLink(event) {
+
+                event.preventDefault();
+
+                $.get("/ajaxEndpoint800", function() {
+                     window.location.href = "/link6";
+                });
+            }
+
+        </script>
+
+    </body>
+</html>

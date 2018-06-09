@@ -17,7 +17,7 @@ describe('browser.text()', function() {
 
 		const browser = new Browser();
 
-		await browser.visit("/simplehtml");
+		await browser.visit("/htmlsimple");
 
 		expect(await browser.text()).to.contain("This is the title");
 		expect(await browser.text()).to.contain("First paragraph");
@@ -33,7 +33,7 @@ describe('browser.text()', function() {
 
 		const browser = new Browser();
 
-		await browser.visit("/simplehtml");
+		await browser.visit("/htmlsimple");
 
 		expect(await browser.text("#secondParagraph")).not.to.contain("First paragraph");
 		expect(await browser.text("#secondParagraph")).to.contain("And here is a second paragraph");
@@ -44,7 +44,7 @@ describe('browser.text()', function() {
 
 		const browser = new Browser();
 
-		await browser.visit("/simplehtml");
+		await browser.visit("/htmlsimple");
 
 		expect(await browser.text(".paragraphOfInterest")).not.to.contain("First paragraph");
 		expect(await browser.text(".paragraphOfInterest")).to.contain("And here is a second paragraph");

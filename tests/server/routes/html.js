@@ -1,7 +1,7 @@
 module.exports = function(app) {
 
-	app.get('/simplehtml', function(req, res) {
-		res.render("simplehtml");
+	app.get('/htmlsimple', function(req, res) {
+		res.render("htmlsimple");
 	});
 
 	app.get('/link1', function(req, res) {
@@ -14,6 +14,18 @@ module.exports = function(app) {
 
 	app.get('/link3', function(req, res) {
 		res.render("link3");
+	});
+
+	app.get('/link4', function(req, res) {
+		res.render("link4");
+	});
+
+	app.get('/link5', function(req, res) {
+		res.render("link5");
+	});
+
+	app.get('/link6', function(req, res) {
+		res.render("link6");
 	});
 
 }

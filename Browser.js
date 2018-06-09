@@ -1,6 +1,8 @@
 const phantom = require('phantom');
 const fs = require('fs');
 
+const Scripts = require('./lib/Scripts');
+
 // used for Mocha tests
 process.on('unhandledRejection', function(reason) {
 	throw reason;
@@ -72,7 +74,7 @@ module.exports = function(args) {
 	var fill = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			const script = await getScript("fill", selector, value);
+			const script = await Scripts.fetch("fill", selector, value);
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});
@@ -81,7 +83,7 @@ module.exports = function(args) {
 	var select = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			const script = await getScript("select", selector, value);
+			const script = await Scripts.fetch("select", selector, value);
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});
@@ -90,7 +92,7 @@ module.exports = function(args) {
 	var choose = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
-			const script = await getScript("choose", selector, value);
+			const script = await Scripts.fetch("choose", selector, value);
 			await phantomPage.evaluateJavaScript(script);
 			resolve();
 		});
@@ -101,50 +103,50 @@ module.exports = function(args) {
 	*/
 
 	var pressButton = function(selector) {
-		log("pressing button '" + selector + "'");
+		return activateElement("pressButton", selector);
+	}
+
+	var clickLink = function(selector) {
+		return activateElement("clickLink", selector);
+	}
+
+	var activateElement = function(command, selector) {
+		log(command + " '" + selector + "'");
 		return new Promise(async function(resolve, reject) {
 
 			callbackWaiting = resolve;
 
-			const script = await getScript("pressButton", selector);
-			const error = await phantomPage.evaluateJavaScript(script);
-			if (error) {
-				log("Error " + error);
-			}
+			const script = await Scripts.fetch(command, selector);
+			await phantomPage.evaluateJavaScript(script);
 
-			redirectTimeout = setTimeout(() => {
+			redirectTimeout = setTimeout(async () => {
 				if (!navigationRequested && callbackWaiting) {
-					log("pressButton complete (within pressButton) no navigationRequested" + selector);
-					callbackWaiting();
-					callbackWaiting = false;
+
+					if (await pendingAjax() == 0) {
+						log(command + " complete (within clickElement) no navigationRequested" + selector);
+						callbackWaiting();
+						callbackWaiting = false;
+					} else {
+						log(command + " waiting for all pending ajax calls to complete");
+					}
 				}
 			}, waitForRedirection);
 		});
 	}
 
-	var clickLink = function(selector) {
-		log("clicking on link '" + selector + "'");
-		return new Promise(async function(resolve, reject) {
+	var pendingAjax = function() {
+		return new Promise(async (resolve) => {
+			const script = await Scripts.fetch("pendingjQueryAjax");
+			const pendingCount = await phantomPage.evaluateJavaScript(script);
+			resolve(pendingCount);
 
-			callbackWaiting = resolve;
-
-			const script = await getScript("clickLink", selector);
-			await phantomPage.evaluateJavaScript(script);
-
-			redirectTimeout = setTimeout(() => {
-				if (!navigationRequested && callbackWaiting) {
-					log("clickLink complete (within clickLink) no navigationRequested" + selector);
-					callbackWaiting();
-					callbackWaiting = false;
-				}
-			}, waitForRedirection);
 		});
 	}
 
 	var text = function(selector) {
 		return new Promise(async function(resolve, reject) {
 
-			const script = await getScript("text", selector);
+			const script = await Scripts.fetch("text", selector);
 			let text = await phantomPage.evaluateJavaScript(script);
 
 			if (text) {
@@ -157,7 +159,7 @@ module.exports = function(args) {
 	var html = function() {
 		return new Promise(async function(resolve, reject) {
 
-			const script = await getScript("html");
+			const script = await Scripts.fetch("html");
 			let html = await phantomPage.evaluateJavaScript(script);
 
 			if (html) {
@@ -177,7 +179,7 @@ module.exports = function(args) {
 	var query = function(selector) {
 		return new Promise(async function(resolve, reject) {
 
-			const script = await getScript("query", selector);
+			const script = await Scripts.fetch("query", selector);
 			const result = await phantomPage.evaluateJavaScript(script);
 
 			if (result) {
@@ -280,181 +282,6 @@ module.exports = function(args) {
 
 	function log(text) {
 		console.log("\x1b[32m " + "Browser" + "\x1b[0m " + text + "\x1b[0m");
-	}
-
-	function getScript(name, selector, value) {
-		return new Promise(resolve => {
-
-			let script;
-
-			if (name == "html") {
-				script = `
-				function(){ 
-					return document.documentElement.outerHTML;
-				}`;
-			}
-
-			if (name == "query") {
-				script = `
-				function(){ 
-					return document.querySelectorAll("${selector}").length !== 0; 
-				}`;
-			}
-
-			if (name == "fill") {
-				script = `
-				function(){ 
-					document.querySelectorAll("input[name='${selector}'],input${selector},textarea[name='${selector}'],textarea${selector}")[0].value = '${value}'; 
-				}`;
-			}
-
-			if (name == "select") {
-				script = `
-				function(){ 
-					var selectObj = document.querySelectorAll("select[name='${selector}'],select${selector}")[0];
-					
-					for (var i = 0; i < selectObj.options.length; i++) { 
-						if (selectObj.options && selectObj.options[i] && ((selectObj.options[i].text == '${value}') || (selectObj.options[i].value == '${value}'))) { 
-							selectObj.options[i].selected = true;
-							return;
-						}
-					}
-				}`;
-			}
-
-			if (name == "choose") {
-				script = `
-				function(){ 
-					var inputObjs = document.querySelectorAll("input[name='${selector}'],input${selector}"); 
-
-					if (inputObjs.length == 1) { 
-						inputObjs[0].checked = true;
-						return;
-					} 
-
-					for (var i = 0; i < inputObjs.length; i++) {
-						if (inputObjs[i] && ((inputObjs[i].value == '${selector}') || (inputObjs[i].value == '${value}'))) { 
-							inputObjs[i].checked = true;
-							return;
-						}
-					}
-				}`;
-
-			}
-
-			if (name == "text") {
-				script = `
-				function(){ 
-
-					var pageText = document.querySelectorAll("body")[0].innerText; 
-					var inputs = document.querySelectorAll("input,textarea"); 
-
-					var inputText = ""; 
-					for (var i = 0; i < inputs.length; i++) {
-						inputText += " " + inputs[i].value
-					}; 
-
-					return pageText + inputText
-				}`;
-
-				if (selector) {
-					script = `
-					function(){ 
-						if (!document.querySelectorAll("${selector}")[0]) {
-							return ''; 
-						}
-
-						var text = ""; 
-						for (var i = 0; i < document.querySelectorAll("${selector}").length; i++) { 
-							text += " " + (document.querySelectorAll("${selector}")[i].value || document.querySelectorAll("${selector}")[i].innerText)
-						}; 
-						return text;
-					}`;
-				}
-			}
-
-			if (name == "pressButton") {
-
-				if (selector.indexOf(".") === -1 && selector.indexOf("#") === -1) {
-					script = `
-					function(){ 
-						var possibleButtons = document.querySelectorAll("button, input, a.btn"); 
-						var buttonToClick; 
-
-						for (var i = 0; i < possibleButtons.length; i++) { 
-							if (possibleButtons[i].innerText.indexOf('${selector}') !== -1) {
-								buttonToClick = possibleButtons[i]
-							};
-						} 
-
-						if(!buttonToClick) { 
-							return "No button found for ${selector}"; 
-						} 
-
-						buttonToClick.click(); 
-
-						var href = buttonToClick.getAttribute('href'); 
-						if (href && href.length > 1) {
-							window.location.href = href;
-						}
-					}`;
-
-				} else {
-					script = `
-					function(){ 
-						var debug; 
-						var buttonToClick = document.querySelectorAll("button${selector}, input${selector}, a.btn${selector}")[0]; 
-
-						buttonToClick.click();
-
-						var href = buttonToClick.getAttribute('href'); 
-						if (href && href.length > 1 && href[0] !== '#') {
-							window.location.href = href
-						}
-					}`;
-				}
-			}
-
-			if (name == "clickLink") {
-
-				const selectorIsIdOrClass = selector.indexOf(".") != -1 || selector.indexOf("#") != -1;
-
-				if (selectorIsIdOrClass) {
-					script = `
-					function(){ 
-						var foundLink = document.querySelectorAll("a${selector}")[0];
-
-						if (!foundLink) {
-							return;
-						} 
-
-						foundLink.click(); 
-					}`;
-				} else {
-					script = `
-					function(){ 
-						var aTags = document.getElementsByTagName("a"); 
-
-						var foundLink; 
-						for (var i = 0; i < aTags.length; i++) { 
-							if (aTags[i].textContent ==  "${selector}") { 
-								foundLink = aTags[i]; 
-								break;
-							}
-						} 
-
-						if (!foundLink) {
-							return;
-						}
-
-						foundLink.click();
-					}`;
-				}
-
-			}
-
-			resolve(script);
-		});
 	}
 
 	return {

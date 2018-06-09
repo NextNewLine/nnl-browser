@@ -7,7 +7,7 @@ describe('browser.query()', function() {
 
 		const browser = new Browser();
 
-		await browser.visit("/simplehtml");
+		await browser.visit("/htmlsimple");
 
 		expect(await browser.query("#firstParagraph")).not.to.exist;
 		expect(await browser.query("#secondParagraph")).to.exist;
@@ -19,7 +19,7 @@ describe('browser.query()', function() {
 
 		const browser = new Browser();
 
-		await browser.visit("/simplehtml");
+		await browser.visit("/htmlsimple");
 
 		expect(await browser.query(".paragraphOfInterest")).to.exist;
 		expect(await browser.query(".notARealClass")).not.to.exist;
@@ -30,7 +30,7 @@ describe('browser.query()', function() {
 
 		const browser = new Browser();
 
-		await browser.visit("/simplehtml");
+		await browser.visit("/htmlsimple");
 
 		expect(await browser.query("#secondParagraph.paragraphOfInterest")).to.exist;
 		expect(await browser.query("#secondParagraph.notARealClass")).not.to.exist;

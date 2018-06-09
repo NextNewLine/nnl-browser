@@ -6,7 +6,8 @@
   "scripts": {
     "pretest": "pkill node; node tests/server/server.js & sleep 2;",
     "test": "mocha tests/integration/ --ui qunit --reporter spec --timeout 20000 --recursive --bail --exit",
-    "posttest": "pkill node"
+    "posttest": "pkill node",
+    "start": "pkill node; node tests/server/server.js"
   },
   "repository": {
     "type": "git",

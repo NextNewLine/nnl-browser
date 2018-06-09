@@ -24,4 +24,47 @@ describe('browser.clickLink()', function() {
 		expect(await browser.text()).to.contain("Link 1");
 
 	});
+
+	it("Links which have a delay before they change page will work.", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/link4");		
+		await browser.clickLink("Hats for all");
+		expect(await browser.text()).to.contain("Link 5");
+
+		await browser.visit("/link4");		
+		await browser.clickLink("I like your shoes");
+		expect(await browser.text()).to.contain("Link 5");
+
+	});
+
+	it("We can set the waitForRedirection to be shorter, causing trouble.", async function() {
+
+		const args = {
+			waitForRedirection: 1
+		};
+
+		const browser = new Browser(args);
+
+		await browser.visit("/link4");		
+		await browser.clickLink("Hats for all");
+		expect(await browser.text()).to.contain("Link 4");
+
+		await browser.visit("/link4");		
+		await browser.clickLink("I like your shoes");
+		expect(await browser.text()).to.contain("Link 4");
+
+	});
+
+	it("We are patient with slow ajax calls", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/link5");		
+		await browser.clickLink("Love it!");
+		expect(await browser.text()).to.contain("Link 6");
+
+	});
+
 });

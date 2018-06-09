@@ -7,7 +7,7 @@ describe('browser.html()', function() {
 
 		const browser = new Browser();
 
-		await browser.visit("/simplehtml");
+		await browser.visit("/htmlsimple");
 
 		expect(await browser.html()).to.contain("<title>Test page</title>");
 		expect(await browser.html()).to.contain("<input type=\"text\" name=\"sampleTextInput\" value=\"A text input\">");
