@@ -8,6 +8,10 @@ module.exports = function(app) {
 		res.render("htmlajax");
 	});
 
+	app.get('/htmlajax2', function(req, res) {
+		res.render("htmlajax2");
+	});
+
 	app.get('/link1', function(req, res) {
 		res.render("link1");
 	});

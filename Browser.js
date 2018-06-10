@@ -49,6 +49,7 @@ module.exports = function(args) {
 		log("visiting " + "\x1b[34m" + url);
 
 		return new Promise(async function(resolve, reject) {
+			callbackWaiting = resolve;
 
 			await createPhantom();
 
@@ -59,9 +60,6 @@ module.exports = function(args) {
 			}
 
 			await phantomPage.open(urlToOpen);
-			await waitForAjaxToFinish();
-
-			resolve();
 
 		});
 	}
@@ -76,7 +74,7 @@ module.exports = function(args) {
 					return resolve();
 				}
 				TwirlTimer.start();
-			}, 50);
+			}, 250);
 
 		});
 
@@ -153,6 +151,7 @@ module.exports = function(args) {
 					}
 
 					log(command + " complete (within activateElement) no navigationRequested '" + selector + "'");
+					debug("Callback from activateElement");
 					callbackWaiting();
 					callbackWaiting = false;
 				}
@@ -279,19 +278,23 @@ module.exports = function(args) {
 		let url = await phantomPage.property("url");
 		log("done " + "\x1b[34m" + url);
 
-		if (await pendingAjax() > 0) {
-			log("waiting for all pending ajax calls to complete");
-			await waitForAjaxToFinish();
-		}
+		redirectTimeout = setTimeout(async () => {
+			if (await pendingAjax() > 0) {
+				log("waiting for all pending ajax calls to complete");
+				await waitForAjaxToFinish();
+			}
 
-		// The page has loaded, we've waited for all the ajax stuff to complete. We can go ahead and say the page is loaded
-		if (callbackWaiting && redirectTimeout) {
-			callbackWaiting();
-			clearTimeout(redirectTimeout);
-			redirectTimeout = false;
-			callbackWaiting = false;
-		}
-		navigationRequested = false;
+			// The page has loaded, we've waited for all the ajax stuff to complete. We can go ahead and say the page is loaded
+			if (callbackWaiting && redirectTimeout) {
+				debug("Callback from onLoadFinished");
+				callbackWaiting();
+				clearTimeout(redirectTimeout);
+				redirectTimeout = false;
+				callbackWaiting = false;
+			}
+			navigationRequested = false;
+		}, waitForRedirection);
+
 	};
 
 	const onNavigationRequested = async function(url, type, willNavigate, main) {

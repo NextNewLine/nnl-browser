@@ -62,4 +62,16 @@ describe('browser.text()', function() {
 		expect(await browser.text("#thirdParagraph")).to.contain("800ms here!");
 
 	});
+
+	it("Waits for jQuery ajax requests to complete before checking even if the request takes a while to start", async function() {
+
+		const browser = new Browser({
+			debug: true
+		});
+
+		await browser.visit("/htmlajax2");
+
+		expect(await browser.text("#secondParagraph")).to.contain("100ms here!");
+
+	});
 });
