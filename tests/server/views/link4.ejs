@@ -9,10 +9,10 @@
             Link 4
         </h1>
         <p>
-            This link will only redirect the user after 300ms. <a href="/link5" onclick="clickLink(event);">Hats for all</a>
+            This link will only redirect the user after 600ms. <a href="/link5" onclick="clickLink(event);">Hats for all</a>
         </p>
         <p>
-            This link will only redirect the user after 300ms and has no href. <a onclick="clickLink(event);">I like your shoes</a>
+            This link will only redirect the user after 600ms and has no href. <a onclick="clickLink(event);">I like your shoes</a>
         </p>
 
         <script type="text/javascript">
@@ -20,7 +20,7 @@
                 event.preventDefault();
                 setTimeout(function () {
                     window.location.href = "/link5";
-                }, 300);
+                }, 600);
             }
         </script>
     </body>

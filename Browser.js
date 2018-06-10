@@ -4,33 +4,37 @@ const fs = require('fs');
 const Scripts = require('./lib/Scripts');
 const TwirlTimer = require('./lib/TwirlTimer');
 
-// used for Mocha tests
-process.on('unhandledRejection', function(reason) {
-	throw reason;
-});
-
 module.exports = function(args) {
 
-	var baseUrl = "http://localhost:3000";
+	let baseUrl = "http://localhost:3000";
 
-	var waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
-	var viewportSize = {
+	let waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
+
+	let viewportSize = {
 		width: 600,
 		height: 961
 	}; // default to the iPhone7
-	var loadImages = false;
 
-	if (args && args.site) {
-		baseUrl = args.site;
-	}
-	if (args && args.waitForRedirection) {
-		waitForRedirection = args.waitForRedirection;
-	}
-	if (args && args.viewportSize) {
-		viewportSize = args.viewportSize;
-	}
-	if (args && args.loadImages) {
-		loadImages = args.loadImages;
+	let loadImages = false;
+
+	let logDebug = false;
+
+	if (args) {
+		if (args.site) {
+			baseUrl = args.site;
+		}
+		if (args.waitForRedirection) {
+			waitForRedirection = args.waitForRedirection;
+		}
+		if (args.viewportSize) {
+			viewportSize = args.viewportSize;
+		}
+		if (args.loadImages) {
+			loadImages = args.loadImages;
+		}
+		if (args.debug) {
+			logDebug = args.debug;
+		}
 	}
 
 	var phantomPage;
@@ -135,15 +139,19 @@ module.exports = function(args) {
 			const script = await Scripts.fetch(command, selector);
 			await phantomPage.evaluateJavaScript(script);
 
+			debug("activateElement Finished clicking, now waiting");
+
 			redirectTimeout = setTimeout(async () => {
+				debug("activateElement Finished waitForRedirection");
 				if (!navigationRequested && callbackWaiting) {
+					debug("activateElement !navigationRequested && callbackWaiting");
 
 					if (await pendingAjax() > 0) {
-						log(command + " waiting for all pending ajax calls to complete " + selector);
+						log(command + " (within activateElement) waiting for all pending ajax calls to complete '" + selector + "'");
 						await waitForAjaxToFinish();
 					}
 
-					log(command + " complete (within clickElement) no navigationRequested " + selector);
+					log(command + " complete (within activateElement) no navigationRequested '" + selector + "'");
 					callbackWaiting();
 					callbackWaiting = false;
 				}
@@ -266,9 +274,8 @@ module.exports = function(args) {
 	}
 
 	const onLoadFinished = async function() {
-
+		log("onLoadFinished");
 		let url = await phantomPage.property("url");
-
 		log("done " + "\x1b[34m" + url);
 
 		if (await pendingAjax() > 0) {
@@ -287,9 +294,17 @@ module.exports = function(args) {
 	};
 
 	const onNavigationRequested = async function(url, type, willNavigate, main) {
+		log("load " + "\x1b[34m" + url);
+
+		debug("Current resource array:");
+		resources.forEach(function(resource) {
+			debug("\t" + resource.url + " " + resource.status);
+		});
 
 		// handle either the old, or new,or both links being #something
 		if (resources.length > 0 && (resources[0].url.indexOf('#') > 0 || url.indexOf('#') > 0)) {
+
+			debug("onNavigationRequested detected #anchor tag");
 
 			// ignore any #anchor in the url
 			let currenctUrl = resources[0].url.indexOf('#') > 0 ? resources[0].url.substring(0, resources[0].url.indexOf('#')) : resources[0].url;
@@ -298,16 +313,42 @@ module.exports = function(args) {
 			if (currenctUrl == newUrl) {
 				onLoadFinished();
 				return;
+			} else {
+
+				debug("onNavigationRequested not the same page " + currenctUrl + " " + newUrl);
+
 			}
+		} else {
+			debug("onNavigationRequested no #anchor tag");
 		}
-		log("load " + "\x1b[34m" + url);
 		resources = [];
 		navigationRequested = true;
 	};
 
+	// add to resources list if "start", otherwisde update or add
 	const onResourceReceived = function(response) {
-		if (response.stage !== "end") return;
-		resources.push(response);
+		debug("onResourceReceived " + response.stage + " " + response.url + " " + response.status);
+
+		// If the first thing we get is a redirect, follow it.
+		if (resources.length == 0 && response.status == 302) {
+			return;
+		}
+
+		let updated = false;
+
+		resources.forEach(function(resource, i) {
+			if (resource.url == response.url) {
+				debug("resource updated: " + response.url + " " + response.status);
+				resources[i] = response;
+				updated = true;
+			}
+		});
+
+		if (!updated) {
+			debug("resource added: " + response.url + " " + response.status);
+			resources.push(response);
+		}
+
 	};
 
 	let basicAuthUsername, basicAuthPassword;
@@ -315,6 +356,16 @@ module.exports = function(args) {
 	function authentication(username, password) {
 		basicAuthUsername = username;
 		basicAuthPassword = password;
+	}
+
+	function debug(text) {
+		if (logDebug) {
+			console.log("\x1b[32m " + "Browser [Debug]" + "\x1b[0m " + text + "\x1b[0m");
+		}
+	}
+
+	function log(text) {
+		console.log("\x1b[32m " + "Browser" + "\x1b[0m " + text + "\x1b[0m");
 	}
 
 	return {
@@ -334,6 +385,7 @@ module.exports = function(args) {
 	}
 };
 
-function log(text) {
-	console.log("\x1b[32m " + "Browser" + "\x1b[0m " + text + "\x1b[0m");
-}
+// used for Mocha tests
+process.on('unhandledRejection', function(reason) {
+	throw reason;
+});

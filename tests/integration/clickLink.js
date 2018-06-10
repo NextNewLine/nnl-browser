@@ -28,7 +28,7 @@ describe('browser.clickLink()', function() {
 	it("Links which have a delay before they change page will work.", async function() {
 
 		const browser = new Browser({
-			waitForRedirection: 400
+			waitForRedirection: 1000
 		});
 
 		await browser.visit("/link4");		
