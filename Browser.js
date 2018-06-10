@@ -86,6 +86,7 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 			let url = await phantomPage.property("url");
 			url = url.replace(baseUrl, "");
+			log("Reloading " + url);
 			await visit(url);
 			resolve();
 		});
