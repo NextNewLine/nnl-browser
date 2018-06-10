@@ -79,4 +79,20 @@ describe('browser.clickLink()', function() {
 
 	});
 
+	it("Click to show some text, and the link goes to an #anchor", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/link7");
+		await browser.clickLink("#change");
+
+		expect(await browser.text()).to.contain("Link 7");
+
+		await browser.clickLink("Another link?");
+
+		expect(await browser.text()).to.contain("Link 7");
+		
+
+	});
+
 });

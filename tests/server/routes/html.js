@@ -32,4 +32,8 @@ module.exports = function(app) {
 		res.render("link6");
 	});
 
+	app.get('/link7', function(req, res) {
+		res.render("link7");
+	});
+
 }

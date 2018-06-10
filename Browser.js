@@ -256,53 +256,61 @@ module.exports = function(args) {
 				await phantomPage.setting("password", basicAuthPassword);
 			}
 
-			phantomPage.on("onLoadFinished", async function() {
-
-				let url = await phantomPage.property("url");
-
-				log("done " + "\x1b[34m" + url);
-
-				if (await pendingAjax() > 0) {
-					log("waiting for all pending ajax calls to complete");
-					await waitForAjaxToFinish();
-				}
-
-				// The page has loaded, we've waited for all the ajax stuff to complete. We can go ahead and say the page is loaded
-				if (callbackWaiting && redirectTimeout) {
-					callbackWaiting();
-					clearTimeout(redirectTimeout);
-					redirectTimeout = false;
-					callbackWaiting = false;
-				}
-				navigationRequested = false;
-			});
-
-			phantomPage.on("onNavigationRequested", async function(url, type, willNavigate, main) {	
-				
-				// handle either the old, or new,or both links being #something
-				if (resources.length > 0 && (resources[0].url.indexOf('#') > 0 || url.indexOf('#') > 0)) {
-					if (resources[0].url.substring(0, resources[0].url.indexOf('#')) == url.substring(0, url.indexOf('#'))) {
-
-						return;
-					}
-				}
-
-				log("load " + "\x1b[34m" + url);
-				resources = [];
-				navigationRequested = true;
-			});
-
-			phantomPage.on("onResourceReceived", function(response) {
-				if (response.stage !== "end") return;
-				resources.push(response);
-			});
+			phantomPage.on("onLoadFinished", onLoadFinished);
+			phantomPage.on("onNavigationRequested", onNavigationRequested);
+			phantomPage.on("onResourceReceived", onResourceReceived);
 
 			resolve();
 
 		});
 	}
 
-	var basicAuthUsername, basicAuthPassword;
+	const onLoadFinished = async function() {
+
+		let url = await phantomPage.property("url");
+
+		log("done " + "\x1b[34m" + url);
+
+		if (await pendingAjax() > 0) {
+			log("waiting for all pending ajax calls to complete");
+			await waitForAjaxToFinish();
+		}
+
+		// The page has loaded, we've waited for all the ajax stuff to complete. We can go ahead and say the page is loaded
+		if (callbackWaiting && redirectTimeout) {
+			callbackWaiting();
+			clearTimeout(redirectTimeout);
+			redirectTimeout = false;
+			callbackWaiting = false;
+		}
+		navigationRequested = false;
+	};
+
+	const onNavigationRequested = async function(url, type, willNavigate, main) {
+
+		// handle either the old, or new,or both links being #something
+		if (resources.length > 0 && (resources[0].url.indexOf('#') > 0 || url.indexOf('#') > 0)) {
+
+			// ignore any #anchor in the url
+			let currenctUrl = resources[0].url.indexOf('#') > 0 ? resources[0].url.substring(0, resources[0].url.indexOf('#')) : resources[0].url;
+			let newUrl = url.indexOf('#') > 0 ? url.substring(0, url.indexOf('#')) : url;
+
+			if (currenctUrl == newUrl) {
+				onLoadFinished();
+				return;
+			}
+		}
+		log("load " + "\x1b[34m" + url);
+		resources = [];
+		navigationRequested = true;
+	};
+
+	const onResourceReceived = function(response) {
+		if (response.stage !== "end") return;
+		resources.push(response);
+	};
+
+	let basicAuthUsername, basicAuthPassword;
 
 	function authentication(username, password) {
 		basicAuthUsername = username;

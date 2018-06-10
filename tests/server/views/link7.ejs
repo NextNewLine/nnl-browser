@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test page</title>
+        <script
+          src="https://code.jquery.com/jquery-3.3.1.js"
+          integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+          crossorigin="anonymous"></script>         
+    </head>
+
+    <body>
+        <h1>
+            Link 7
+        </h1>
+        <p>
+            This link toggles another paragraph. <a onclick="$('#hiddenParagraph').toggle()" id="change" href="#hidden">Ch-ch-changes</a>
+        </p>
+        <p style="display:none;" id="hiddenParagraph">
+            I'm hidden! <a href="#foo">Another link?</a>
+        </p>
+
+    </body>
+</html>
