@@ -1,10 +1,23 @@
-const phantom = require('phantom');
-const fs = require('fs');
-
 const Scripts = require('./lib/Scripts');
 const TwirlTimer = require('./lib/TwirlTimer');
 
+const M14BrowserPhantom = require("./browsers/M14BrowserPhantom");
+const M14BrowserRemoteControl = require("./browsers/M14BrowserRemoteControl");
+
 module.exports = function(args) {
+
+	const driverArgs = {
+		onLoadFinished,
+		onNavigationRequested,
+		onResourceReceived
+	};
+
+	let m14BrowserDriver;
+	if (args && args.remoteControl) {
+		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
+	} else {
+		m14BrowserDriver = new M14BrowserPhantom(driverArgs);
+	}
 
 	let baseUrl = "http://localhost:3000";
 
@@ -37,8 +50,6 @@ module.exports = function(args) {
 		}
 	}
 
-	var phantomPage;
-	var phantomInstance;
 	var callbackWaiting;
 	var navigationRequested = false;
 	var redirectTimeout;
@@ -51,7 +62,11 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 			callbackWaiting = resolve;
 
-			await createPhantom();
+			if (args && args.authentication) {
+				driverArgs.authentication = args.authentication;
+			}
+
+			await m14BrowserDriver.create(driverArgs);
 
 			var urlToOpen = url;
 
@@ -59,7 +74,7 @@ module.exports = function(args) {
 				urlToOpen = baseUrl + url;
 			}
 
-			await phantomPage.open(urlToOpen);
+			await m14BrowserDriver.open(urlToOpen);
 
 		});
 	}
@@ -82,7 +97,7 @@ module.exports = function(args) {
 
 	var reload = function() {
 		return new Promise(async function(resolve, reject) {
-			let url = await phantomPage.property("url");
+			let url = await m14BrowserDriver.property("url");
 			url = url.replace(baseUrl, "");
 			log("Reloading " + url);
 			await visit(url);
@@ -94,7 +109,7 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 
 			const script = await Scripts.fetch("fill", selector, value);
-			await phantomPage.evaluateJavaScript(script);
+			await m14BrowserDriver.evaluateJavaScript(script);
 			resolve();
 		});
 	}
@@ -103,7 +118,7 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 
 			const script = await Scripts.fetch("select", selector, value);
-			await phantomPage.evaluateJavaScript(script);
+			await m14BrowserDriver.evaluateJavaScript(script);
 			resolve();
 		});
 	}
@@ -112,7 +127,7 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 
 			const script = await Scripts.fetch("choose", selector, value);
-			await phantomPage.evaluateJavaScript(script);
+			await m14BrowserDriver.evaluateJavaScript(script);
 			resolve();
 		});
 	}
@@ -136,7 +151,7 @@ module.exports = function(args) {
 			callbackWaiting = resolve;
 
 			const script = await Scripts.fetch(command, selector);
-			await phantomPage.evaluateJavaScript(script);
+			await m14BrowserDriver.evaluateJavaScript(script);
 
 			debug("activateElement Finished clicking, now waiting");
 
@@ -162,7 +177,7 @@ module.exports = function(args) {
 	var pendingAjax = function() {
 		return new Promise(async (resolve) => {
 			const script = await Scripts.fetch("pendingjQueryAjax");
-			const pendingCount = await phantomPage.evaluateJavaScript(script);
+			const pendingCount = await m14BrowserDriver.evaluateJavaScript(script);
 			resolve(pendingCount);
 
 		});
@@ -172,7 +187,7 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 
 			const script = await Scripts.fetch("text", selector);
-			let text = await phantomPage.evaluateJavaScript(script);
+			let text = await m14BrowserDriver.evaluateJavaScript(script);
 
 			if (text) {
 				text = text.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
@@ -185,7 +200,7 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 
 			const script = await Scripts.fetch("html");
-			let html = await phantomPage.evaluateJavaScript(script);
+			let html = await m14BrowserDriver.evaluateJavaScript(script);
 
 			if (html) {
 				html = html.replace(/\r?\n|\r/g, " ").replace(/ +(?= )/g, '').replace(/\t/g, " ");;
@@ -205,7 +220,7 @@ module.exports = function(args) {
 		return new Promise(async function(resolve, reject) {
 
 			const script = await Scripts.fetch("query", selector);
-			const result = await phantomPage.evaluateJavaScript(script);
+			const result = await m14BrowserDriver.evaluateJavaScript(script);
 
 			if (result) {
 				return resolve(true);
@@ -216,66 +231,12 @@ module.exports = function(args) {
 	};
 
 	var screenShot = function(name) {
-		return new Promise(async function(resolve, reject) {
-
-			const fileName = name + ".png";
-			const dir = "screenshots/";
-
-			var base64 = await phantomPage.renderBase64('PNG');
-
-			log("screenshot taken");
-
-			fs.existsSync(dir) || fs.mkdirSync(dir);
-
-			fs.writeFile(dir + fileName, base64, 'base64', function() {
-				resolve();
-			});
-
-		});
+		return m14BrowserDriver.screenshot(name);
 	}
 
-	var createPhantom = function() {
-
-		return new Promise(async function(resolve, reject) {
-
-			if (phantomPage) {
-				if (phantomPage !== true) {
-					return resolve();
-				}
-				// Still being created, try again in 10 ms
-				log("\x1b[31mError: Still being created, waiting then trying again");
-				return setTimeout(createPhantom().then(resolve), 100);
-			}
-
-			phantomPage = true;
-
-			var options = ["--ignore-ssl-errors=yes"];
-			if (!loadImages) {
-				options.push("--load-images=no");
-			}
-
-			phantomInstance = await phantom.create(options);
-
-			phantomPage = await phantomInstance.createPage();
-			phantomPage.property("viewportSize", viewportSize);
-
-			if (basicAuthUsername && basicAuthPassword) {
-				await phantomPage.setting("userName", basicAuthUsername);
-				await phantomPage.setting("password", basicAuthPassword);
-			}
-
-			phantomPage.on("onLoadFinished", onLoadFinished);
-			phantomPage.on("onNavigationRequested", onNavigationRequested);
-			phantomPage.on("onResourceReceived", onResourceReceived);
-
-			resolve();
-
-		});
-	}
-
-	const onLoadFinished = async function() {
+	async function onLoadFinished() {
 		log("onLoadFinished");
-		let url = await phantomPage.property("url");
+		let url = await m14BrowserDriver.property("url");
 		log("done " + "\x1b[34m" + url);
 
 		redirectTimeout = setTimeout(async () => {
@@ -297,7 +258,7 @@ module.exports = function(args) {
 
 	};
 
-	const onNavigationRequested = async function(url, type, willNavigate, main) {
+	async function onNavigationRequested(url) {
 		log("load " + "\x1b[34m" + url);
 
 		debug("Current resource array:");
@@ -330,7 +291,7 @@ module.exports = function(args) {
 	};
 
 	// add to resources list if "start", otherwisde update or add
-	const onResourceReceived = function(response) {
+	function onResourceReceived(response) {
 		debug("onResourceReceived " + response.stage + " " + response.url + " " + response.status);
 
 		// If the first thing we get is a redirect, follow it.
@@ -355,11 +316,8 @@ module.exports = function(args) {
 
 	};
 
-	let basicAuthUsername, basicAuthPassword;
-
 	function authentication(username, password) {
-		basicAuthUsername = username;
-		basicAuthPassword = password;
+		return m14BrowserDriver.authentication(username, password);
 	}
 
 	function debug(text) {

@@ -16,7 +16,24 @@ describe('browser.authentication()', function() {
 	it("With basic authentication you get a 200", async function() {
 
 		const browser = new Browser();
-		browser.authentication("username", "password");
+
+		await browser.authentication("username", "password");
+		await browser.visit("/authentication");
+
+		expect(await browser.status()).to.equal(200);
+
+	});
+
+	it("With basic authentication passed via the args you get a 200", async function() {
+
+		const args = {
+			authentication: {
+				username: "username",
+				password: "password"
+			}
+		};
+
+		const browser = new Browser(args);
 
 		await browser.visit("/authentication");
 
