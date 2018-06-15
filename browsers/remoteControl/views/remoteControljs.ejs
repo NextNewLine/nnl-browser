@@ -2,8 +2,9 @@ var remoteUrl = "<%-remoteUrl%>";
 
 function checkForEvents() {
 	console.log("Checking for new events");
+
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', remoteUrl + '/nextEvent');
+	xhr.open('GET', remoteUrl + '/currentEvent');
 	xhr.onload = function() {
 		var event = JSON.parse(xhr.responseText);
 		if (event) {
@@ -27,22 +28,51 @@ function completeEvent(id, results, callback) {
 			}
 		}
 	}
-	console.log("results", results);
-	xhr.send("results=" + JSON.stringify(results));
+	xhr.send("id=" + id + "&results=" + JSON.stringify(results));
+}
+
+function startEvent(id, callback) {
+	console.log("Started event", id);
+
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', remoteUrl + '/startedEvent', true);
+	xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+			if (callback) {
+				callback();
+			}
+		}
+	}
+	xhr.send("id=" + JSON.stringify(id));
 }
 
 function handleEvent(event) {
 	console.log("Recieved event", event);
 
 	if (event.type == "open") {
-		completeEvent(event.id, true, function() {
-			window.location = event.body.url;
-		});
+		if (event.state == "waiting") {
+			startEvent(event.id, function(){
+				window.location = event.body.url;
+			});
+		}
+
+		if (event.state == "started") {
+			completeEvent(event.id, true);
+		}
 	}
 
 	if (event.type == "script") {
-		var results = eval("(" + event.body.script + ")")();
-		completeEvent(event.id, results);
+		if (event.state == "waiting") {
+			startEvent(event.id, function(){
+				var results = eval("(" + event.body.script + ")")();
+				completeEvent(event.id, results);
+			});
+		}
+		
+		if (event.state == "started") {
+			completeEvent(event.id, true);
+		}
 	}
 }
 

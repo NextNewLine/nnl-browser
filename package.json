@@ -1,6 +1,6 @@
 {
   "name": "m14-browser",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "phantom": "4.*"
   },
   "devDependencies": {
+    "mocha": "^5.2.0",
     "basic-auth": "^2.0.0",
     "chai": "4.*",
     "ejs": "^2.6.1",

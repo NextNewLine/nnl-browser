@@ -1,63 +1,16 @@
-const phantom = require('phantom');
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
+const RemoteControlServer = require("./remoteControl/RemoteControlServer");
 
 module.exports = function(eventArgs) {
 
-	let remoteUrl = "http://localhost:1414";
+	const remoteControlServerArgs = {
+		eventComplete: handleEventComplete
+	};
 
 	if (eventArgs && eventArgs.args && eventArgs.args.remoteUrl) {
-		remoteUrl = eventArgs.args.remoteUrl;
+		remoteControlServerArgs.remoteUrl = eventArgs.args.remoteUrl;
 	}
 
-	const app = express();
-	app.set('view engine', 'ejs');
-	app.set('views', path.join(__dirname, '/remoteControl/views'));
-
-	app.use(bodyParser.urlencoded({
-		extended: false
-	}))
-	app.use(bodyParser.json());
-
-	app.use(function(request, response, next) {
-		response.header("Access-Control-Allow-Origin", "*");
-		response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-		next();
-	});
-
-	let fileLoaded = false;
-	app.get('/remoteControl.js', function(req, res) {
-		const remoteControlArgs = {
-			remoteUrl: remoteUrl
-		};
-
-		res.render('remoteControljs', remoteControlArgs);
-		fileLoaded = true;
-	});
-
-	let nextEvent = false;
-	app.get('/nextEvent', function(req, res) {
-		if (!nextEvent) {
-			return res.json(false);
-		}
-		console.log("Next event requested", nextEvent.id);
-		res.json(nextEvent);
-	});
-
-	app.post('/completedEvent', function(req, res) {
-
-		const results = JSON.parse(req.body.results);
-		handleEventComplete(nextEvent, results);
-		nextEvent = false;
-		res.sendStatus(200);
-	});
-
-	let serverListening = false;
-	app.listen(1414, () => {
-		serverListening = true;
-		console.log('Remote control server now listening on port 1414!');
-	});
+	const remoteControlServer = new RemoteControlServer(remoteControlServerArgs);
 
 	let currentUrl;
 	// Wait for connection to be established
@@ -65,28 +18,11 @@ module.exports = function(eventArgs) {
 
 		return new Promise(async function(resolve, reject) {
 
-			await waitUntilReady();
+			await remoteControlServer.waitUntilReady();
 			console.log("Created");
 			resolve();
 
 		});
-	}
-
-	function waitUntilReady() {
-		return new Promise(function(resolve) {
-			const interval = setInterval(function() {
-
-				console.log("Waiting for connection");
-
-				if (serverListening && fileLoaded) {
-					console.log("Connected!");
-					clearInterval(interval);
-					return resolve();
-				}
-
-			}, 1000);
-
-		})
 	}
 
 	function open(url) {
@@ -99,7 +35,7 @@ module.exports = function(eventArgs) {
 
 	function evaluateJavaScript(script) {
 		return new Promise(async function(resolve, reject) {
-			if (nextEvent) {
+			if (remoteControlServer.currentEvent()) {
 				reject("Already waiting for an event to complete");
 			}
 
@@ -137,17 +73,15 @@ module.exports = function(eventArgs) {
 
 	function triggerEvent(type, body, callback) {
 
-		nextEvent = {
-			type: type,
-			body: body,
-			callback: callback,
-			id: new Date().getTime()
-		};
-
 		if (type == "open") {
 			currentUrl = body.url;
 			onNavigationRequested(body.url);
 		}
+
+		remoteControlServer.sendEvent(type, body).then((results) => {
+			callback(results);
+		});
+
 	}
 
 	function handleEventComplete(event, results) {
