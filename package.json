@@ -1,6 +1,6 @@
 {
   "name": "m14-browser",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {

@@ -9,8 +9,9 @@ function checkForEvents() {
 		var event = JSON.parse(xhr.responseText);
 		if (event) {
 			handleEvent(JSON.parse(xhr.responseText));
+		} else {
+			setTimeout(checkForEvents, 250);
 		}
-		setTimeout(checkForEvents, 250);
 	};
 	xhr.send();
 }
@@ -58,7 +59,7 @@ function handleEvent(event) {
 		}
 
 		if (event.state == "started") {
-			completeEvent(event.id, true);
+			completeEvent(event.id, true, checkForEvents);
 		}
 	}
 
@@ -66,12 +67,12 @@ function handleEvent(event) {
 		if (event.state == "waiting") {
 			startEvent(event.id, function(){
 				var results = eval("(" + event.body.script + ")")();
-				completeEvent(event.id, results);
+				completeEvent(event.id, results, checkForEvents);
 			});
 		}
 		
 		if (event.state == "started") {
-			completeEvent(event.id, true);
+			completeEvent(event.id, true, checkForEvents);
 		}
 	}
 }

@@ -46,6 +46,7 @@ module.exports = function(args) {
 
 	let m14BrowserDriver;
 	if (args && args.remoteControl) {
+		console.log(driverArgs);
 		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
 	} else {
 		m14BrowserDriver = new M14BrowserPhantom(driverArgs);

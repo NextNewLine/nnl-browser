@@ -2,12 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-module.exports = function(eventArgs) {
+module.exports = function(args) {
 
 	let remoteUrl = "http://localhost:1414";
 
-	if (eventArgs && eventArgs.args && eventArgs.args.remoteUrl) {
-		remoteUrl = eventArgs.args.remoteUrl;
+	if (args && args.remoteUrl) {
+		remoteUrl = args.remoteUrl;
 	}
 
 	const app = express();
@@ -48,8 +48,15 @@ module.exports = function(eventArgs) {
 	app.post('/completedEvent', function(req, res) {
 		console.log("Completed event", theEvent.id);
 
-		const results = JSON.parse(req.body.results);
-		eventArgs.eventComplete(theEvent, results);
+		let results;
+		if (req.body && req.body.results) {
+			try {
+				results = JSON.parse(req.body.results);
+			} catch(e) {
+				console.log("Error parsing results from event", req.body);
+			}
+		}
+		args.eventComplete(theEvent, results);
 		theEvent = false;
 		res.sendStatus(200);
 	});
@@ -68,7 +75,7 @@ module.exports = function(eventArgs) {
 
 	function waitUntilReady() {
 		return new Promise(function(resolve) {
-			console.log("Waiting for connection ... ");
+			console.log("Waiting for connection ... ", remoteUrl);
 
 			const interval = setInterval(function() {
 
