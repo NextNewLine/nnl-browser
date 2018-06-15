@@ -6,19 +6,6 @@ const M14BrowserRemoteControl = require("./browsers/M14BrowserRemoteControl");
 
 module.exports = function(args) {
 
-	const driverArgs = {
-		onLoadFinished,
-		onNavigationRequested,
-		onResourceReceived
-	};
-
-	let m14BrowserDriver;
-	if (args && args.remoteControl) {
-		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
-	} else {
-		m14BrowserDriver = new M14BrowserPhantom(driverArgs);
-	}
-
 	let baseUrl = "http://localhost:3000";
 
 	let waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
@@ -48,6 +35,20 @@ module.exports = function(args) {
 		if (args.debug) {
 			logDebug = args.debug;
 		}
+	}
+	
+	const driverArgs = {
+		onLoadFinished,
+		onNavigationRequested,
+		onResourceReceived,
+		args: args
+	};
+
+	let m14BrowserDriver;
+	if (args && args.remoteControl) {
+		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
+	} else {
+		m14BrowserDriver = new M14BrowserPhantom(driverArgs);
 	}
 
 	var callbackWaiting;

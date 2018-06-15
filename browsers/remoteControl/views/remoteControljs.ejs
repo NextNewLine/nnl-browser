@@ -1,7 +1,9 @@
+var remoteUrl = "<%-remoteUrl%>";
+
 function checkForEvents() {
 	console.log("Checking for new events");
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'http://localhost:1414/nextEvent');
+	xhr.open('GET', remoteUrl + '/nextEvent');
 	xhr.onload = function() {
 		var event = JSON.parse(xhr.responseText);
 		if (event) {
@@ -16,7 +18,7 @@ function completeEvent(id, results, callback) {
 	console.log("Completed event", id, results);
 
 	var xhr = new XMLHttpRequest();
-	xhr.open('POST', 'http://localhost:1414/completedEvent', true);
+	xhr.open('POST', remoteUrl + '/completedEvent', true);
 	xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {

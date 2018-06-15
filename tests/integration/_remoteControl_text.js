@@ -10,7 +10,8 @@ describe('Remote Control browser.text()', function() {
 		});
 
 		const controlledBrowser = new Browser({
-			debug: true
+			debug: true,
+			remoteUrl: "http://localhost:1414"
 		});
 		await controlledBrowser.visit("/remoteControl");
 

@@ -1,10 +1,19 @@
 const phantom = require('phantom');
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 module.exports = function(eventArgs) {
 
+	let remoteUrl = "http://localhost:1414";
+
+	if (eventArgs && eventArgs.args && eventArgs.args.remoteUrl) {
+		remoteUrl = eventArgs.args.remoteUrl;
+	}
+
 	const app = express();
+	app.set('view engine', 'ejs');
+	app.set('views', path.join(__dirname, '/remoteControl/views'));
 
 	app.use(bodyParser.urlencoded({
 		extended: false
@@ -19,12 +28,12 @@ module.exports = function(eventArgs) {
 
 	let fileLoaded = false;
 	app.get('/remoteControl.js', function(req, res) {
-		fileLoaded = true;
-
-		const options = {
-			root: __dirname
+		const remoteControlArgs = {
+			remoteUrl: remoteUrl
 		};
-		res.sendFile('remoteControl/remoteControl.js', options);
+
+		res.render('remoteControljs', remoteControlArgs);
+		fileLoaded = true;
 	});
 
 	let nextEvent = false;
