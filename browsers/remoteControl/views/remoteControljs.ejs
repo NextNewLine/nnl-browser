@@ -64,10 +64,22 @@ function handleEvent(event) {
 	}
 
 	if (event.type == "script") {
+
 		if (event.state == "waiting") {
-			startEvent(event.id, function(){
-				var results = eval("(" + event.body.script + ")")();
-				completeEvent(event.id, results, checkForEvents);
+			startEvent(event.id, function() {
+				
+				// Do we want to execute this script in the current page, or an IAB page?
+				if (cordovaIabReference) {
+					var details = {
+						code: "(" + event.body.script + ")()"
+					};
+					cordovaIabReference.executeScript(details, function(results) {
+						completeEvent(event.id, results[0], checkForEvents);
+					});
+				} else {
+					var results = eval("(" + event.body.script + ")")();
+					completeEvent(event.id, results, checkForEvents);
+				}
 			});
 		}
 		
@@ -77,4 +89,21 @@ function handleEvent(event) {
 	}
 }
 
+var realCordovaIABOpen;
+var cordovaIabReference;
+
+function cordova_init() {
+	if (typeof cordova === "undefined") {
+		return;
+	}
+
+	realCordovaIABOpen = cordova.InAppBrowser.open;
+
+	cordova.InAppBrowser.open = function(url, target, options) {
+		cordovaIabReference = realCordovaIABOpen(url, target, options);
+		return cordovaIabReference;
+	};
+}
+
 setTimeout(checkForEvents, 250);
+document.addEventListener("deviceready", cordova_init, false);
