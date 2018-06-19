@@ -211,6 +211,15 @@ module.exports = function(args) {
 		});
 	}
 
+	var runScript = function(script) {
+		return new Promise(async function(resolve, reject) {
+
+			const results = await m14BrowserDriver.evaluateJavaScript("function(){ " + script + "}");
+			resolve(results);
+
+		});
+	}
+
 	var status = function() {
 		return new Promise(function(resolve, reject) {
 			resolve(resources[resources.length - 1].status);
@@ -344,6 +353,7 @@ module.exports = function(args) {
 		query,
 		authentication,
 		status,
+		runScript,
 		screenShot
 	}
 };
