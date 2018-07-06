@@ -133,6 +133,15 @@ module.exports = function(args) {
 		});
 	}
 
+	var uncheck = function(selector, value) {
+		return new Promise(async function(resolve, reject) {
+
+			const script = await Scripts.fetch("uncheck", selector, value);
+			await m14BrowserDriver.evaluateJavaScript(script);
+			resolve();
+		});
+	}
+
 	/*
 		callbackWaiting to be called once the button has been pressed and the page reloads
 	*/
@@ -348,6 +357,7 @@ module.exports = function(args) {
 		pressButton,
 		clickLink,
 		choose,
+		uncheck,
 		text,
 		html,
 		query,

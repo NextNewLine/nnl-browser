@@ -1,7 +1,7 @@
 const Browser = require("../../Browser");
 const expect = require('chai').expect;
 
-describe('browser.fill(), browser.select(), browser.choose(), browser.pressButton()', function() {
+describe('browser.fill(), browser.select(), browser.choose(), browser.uncheck(), browser.pressButton()', function() {
 
 	it("Filled in values (using the inputs' name and text) are submitted in the form", async function() {
 
@@ -20,6 +20,21 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.pressButto
 		expect(await browser.text("#formResults")).to.contain("Textareasaremylife");
 		expect(await browser.text("#formResults")).to.contain("russianblue");
 		expect(await browser.text("#formResults")).to.contain("other");
+
+	});
+
+	it("Choose and uncheck can be used", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/forms1");
+
+		await browser.choose("#favePlant2");
+		await browser.uncheck("#favePlant2");
+		
+		await browser.pressButton("#forumSubmitButton");
+
+		expect(await browser.text("#formResults")).not.to.contain("other");
 
 	});
 
