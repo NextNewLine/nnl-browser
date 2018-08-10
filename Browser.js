@@ -41,6 +41,9 @@ module.exports = function(args) {
 		onLoadFinished,
 		onNavigationRequested,
 		onResourceReceived,
+		loadImages,
+		viewportSize,
+		authentication,
 		args: args
 	};
 
