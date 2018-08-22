@@ -71,6 +71,10 @@ Click a link.
 
 Choose and click a radio button.
 
+#### `browser.choose(selector, value)`
+
+Uncheck and click a radio button.
+
 #### `browser.text(selector)`
 
 Return the readable text. Approximatly, this is what the user sees.
