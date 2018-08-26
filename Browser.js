@@ -36,7 +36,7 @@ module.exports = function(args) {
 			logDebug = args.debug;
 		}
 	}
-	
+
 	const driverArgs = {
 		onLoadFinished,
 		onNavigationRequested,
@@ -141,6 +141,19 @@ module.exports = function(args) {
 
 			const script = await Scripts.fetch("uncheck", selector, value);
 			await m14BrowserDriver.evaluateJavaScript(script);
+			resolve();
+		});
+	}
+
+	var login = function(username, password) {
+		return new Promise(async function(resolve, reject) {
+			await visit("/");
+			await fill('username', username);
+			await fill('password', password);
+			await pressButton("#login-button");
+
+			await text();
+			console.log("Signed in " + username);
 			resolve();
 		});
 	}
@@ -364,6 +377,7 @@ module.exports = function(args) {
 		text,
 		html,
 		query,
+		login,
 		authentication,
 		status,
 		runScript,

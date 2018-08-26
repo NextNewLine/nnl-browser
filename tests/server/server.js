@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({
 	extended: false
 }));
 
+require('./routes/index')(app);
 require('./routes/text')(app);
 require('./routes/html')(app);
 require('./routes/status')(app);

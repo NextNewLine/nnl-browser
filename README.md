@@ -43,6 +43,10 @@ describe('Given we view the forms1 page', function() {
 ```
 ## Browser
 
+#### `browser.login(username, password)`
+
+Visit the root URL, auto fill "username" and "password", then submit the forum by pressing the button with the id login-button
+
 #### `browser.visit(url)`
 
 Visit a given Url.
