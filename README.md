@@ -87,7 +87,8 @@ Uncheck and click a radio button.
 
 #### `browser.text(selector)`
 
-Return the readable text. Approximatly, this is what the user sees.
+Return the readable text. Approximatly, this is what the user
+ sees.
 
 #### `browser.html(selector)`
 
