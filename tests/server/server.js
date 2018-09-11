@@ -18,5 +18,6 @@ require('./routes/forms')(app);
 require('./routes/authentication')(app);
 require('./routes/ajax')(app);
 require('./routes/remoteControl')(app);
+require('./routes/redirect')(app);
 
 app.listen(3000, () => console.log('Test server now listening on port 3000!'));

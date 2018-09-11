@@ -1,14 +1,20 @@
 # M14 Browser
 ### An easy to use headless browser, good for testing
 
-**M14 Browser 0.0.x** is tested to work with Node 8 or later. 
+**M14 Browser** is tested to work with Node 8 or later. 
+
 The project is still undergoing frequent changes.
+
+Currently two browsers are supported:
+
+* Zombie
+* Remote control (control any browser or webview with a simple line of JS, designed to work with Cordova)
 
 ## But why
 
 The M14 Browser is a Promise based browser great for testing. It's controlled through a basic interface, which in turn injects JS into the page to control behaviour.
 
-We're (John Kershaw, M14 Industries) building it as a testing tool; you're best not using this for anything at the moment.
+We're (John Kershaw, M14 Industries) building it as a testing tool so we can have a single, promise-based Browser interface which can control multiple different browsers.
 
 Here's an example:
 
@@ -43,9 +49,7 @@ describe('Given we view the forms1 page', function() {
 ```
 ## Browser
 
-#### `browser.login(username, password)`
-
-Visit the root URL, auto fill "username" and "password", then submit the forum by pressing the button with the id login-button
+### Controlling
 
 #### `browser.visit(url)`
 
@@ -75,9 +79,11 @@ Click a link.
 
 Choose and click a radio button.
 
-#### `browser.choose(selector, value)`
+#### `browser.uncheck(selector, value)`
 
 Uncheck and click a radio button.
+
+### Viewing
 
 #### `browser.text(selector)`
 
@@ -91,14 +97,25 @@ Return the html. If no selector is given, returns the whole page.
 
 Does an element exist? Returns `true` or `false`.
 
-#### `browser.authentication(username, password)`
-
-Provide a Basic Auth username and password.
-
 #### `browser.status()`
 
 Return the status of the most recently loaded page (e.g. `200` if everything loaded ok). If a redirect is followed, the value returned will be the page you end up on, not the `3xx` code from the first page.
 
+#### `browser.url()`
+
+Return the complete URL of the page being displayed
+
+
+## Helpful additional functions
+
+#### `browser.authentication(username, password)`
+
+Provide a Basic Auth username and password.
+
 #### `browser.screenShot()`
 
-Take and save a screen shot of the current page. Saves as a png in the /screenshots folder
+Take and save a screen shot of the current page. Saves as a png in the /screenshots folder.
+
+#### `browser.login(username, password)`
+
+Visit the root URL, auto fill "username" and "password", then submit the form by pressing the button with the id login-button

@@ -109,6 +109,13 @@ module.exports = function(args) {
 		});
 	}
 
+	var url = function() {
+		return new Promise(async function(resolve, reject) {
+			const url = await m14BrowserDriver.property("url");
+			resolve(url);
+		});
+	}
+
 	var fill = function(selector, value) {
 		return new Promise(async function(resolve, reject) {
 
@@ -381,7 +388,8 @@ module.exports = function(args) {
 		authentication,
 		status,
 		runScript,
-		screenShot
+		screenShot,
+		url
 	}
 };
 
