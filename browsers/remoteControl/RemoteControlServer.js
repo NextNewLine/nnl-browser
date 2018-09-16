@@ -73,6 +73,14 @@ module.exports = function(args) {
 		console.log('Remote control server now listening on port 1414!');
 	});
 
+	app.on('close', function() {
+		console.log('Stopping M14 Remote Control Server');
+	});
+
+	process.on('SIGINT', function() {
+		app.close();
+	});
+
 	function waitUntilReady() {
 		return new Promise(function(resolve) {
 			console.log("Waiting for connection ... ", remoteUrl);

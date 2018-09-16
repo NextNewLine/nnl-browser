@@ -1,14 +1,17 @@
 # M14 Browser
-### An easy to use headless browser, good for testing
+
+[![NPM](https://nodei.co/npm/m14-browser.png)](https://nodei.co/npm/m14-browser/)
 
 **M14 Browser** is tested to work with Node 8 or later. 
 
 The project is still undergoing frequent changes.
 
+### An easy to use headless browser, good for testing
+
 Currently two browsers are supported:
 
-* Zombie
-* Remote control (control any browser or webview with a simple line of JS, designed to work with Cordova)
+* [PhantomJS](https://www.npmjs.com/package/phantom)
+* [Remote control](#remote-control) (use any browser or webview with a simple line of JS, designed to work with Cordova)
 
 ## But why
 
@@ -120,3 +123,17 @@ Take and save a screen shot of the current page. Saves as a png in the /screensh
 #### `browser.login(username, password)`
 
 Visit the root URL, auto fill "username" and "password", then submit the form by pressing the button with the id login-button
+
+## Remote Control
+
+***Important:*** The remote control browser is currently experimental (even for us). It's being built to allow our existing tests to be run on a Cordova app, on device.
+
+When using Remote Control, you can run your code using any web view which includes the remote control execution script.
+
+```html
+  <script type="text/javascript" src="http://localhost:1414/remoteControl.js"></script>
+```
+
+The process works by running a Remote Control Server on port 1414. The browser loads `remoteControl.js` which in turn polls the Remote Control Server for new events to trigger (e.g. clicking a link).
+
+Our testing code sends commands to the server-side Remote Control Server, which it relays on. Results are relayed back.
