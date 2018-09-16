@@ -31,7 +31,7 @@ module.exports = function(args) {
 			remoteUrl: remoteUrl
 		};
 
-		res.render('remoteControljs.ejs', remoteControlArgs);
+		res.render('remoteControl.js.ejs', remoteControlArgs);
 		fileLoaded = true;
 	});
 

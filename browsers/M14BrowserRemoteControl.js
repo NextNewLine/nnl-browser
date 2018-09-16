@@ -19,7 +19,7 @@ module.exports = function(eventArgs) {
 		return new Promise(async function(resolve, reject) {
 
 			await remoteControlServer.waitUntilReady();
-			console.log("Created");
+			console.log("Created and ready");
 			resolve();
 
 		});

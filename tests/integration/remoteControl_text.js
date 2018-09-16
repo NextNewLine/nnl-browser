@@ -1,22 +1,28 @@
 const Browser = require("../../Browser");
 const expect = require('chai').expect;
 
-describe('Remote Control browser.text()', function() {
+describe('Remote Control browser.text()', () => {
 
-	it("Returns the text on a text-only page", async function() {
+	let browser;
+	let controlledBrowser;
 
-		const browser = new Browser({
-			remoteControl: true
-		});
+	before(async () => {
 
-		const controlledBrowser = new Browser({
-			debug: true,
+		// Create a new Remote Controlled Browser
+		browser = new Browser({
+			remoteControl: true,
 			remoteUrl: "http://localhost:1414"
 		});
-		await controlledBrowser.visit("/remoteControl");
 
+		// Create a browser instance to be controlled.
+		controlledBrowser = new Browser();
+
+		// The controlled browser must be given a starting point with the remote control script tag in
+		controlledBrowser.visit("/remoteControl");
+	});
+
+	it("Returns the text on a text-only page", async () => {
 		await browser.visit("/remoteControl");
 		expect(await browser.text()).to.equal("Hello Remote Controlled World!");
-
 	});
 });
