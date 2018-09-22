@@ -293,7 +293,9 @@ module.exports = function(args) {
 
 			// The page has loaded, we've waited for all the ajax stuff to complete. We can go ahead and say the page is loaded
 			if (callbackWaiting && redirectTimeout) {
+				
 				debug("Callback from onLoadFinished");
+
 				callbackWaiting();
 				clearTimeout(redirectTimeout);
 				redirectTimeout = false;
