@@ -192,6 +192,11 @@ module.exports = function(args) {
 
 			debug("activateElement Finished clicking, now waiting");
 
+			if (await pendingAjax() > 0) {
+				log(command + " (within activateElement) waiting for all pending ajax calls to complete '" + selector + "'");
+				await waitForAjaxToFinish();
+			}
+
 			redirectTimeout = setTimeout(async () => {
 				debug("activateElement Finished waitForRedirection");
 				if (!navigationRequested && callbackWaiting) {
@@ -204,8 +209,12 @@ module.exports = function(args) {
 
 					log(command + " complete (within activateElement) no navigationRequested '" + selector + "'");
 					debug("Callback from activateElement");
-					callbackWaiting();
-					callbackWaiting = false;
+
+					// if the active Element caused the page to reload, the callback may have been called by the onLoadFinish event
+					if (callbackWaiting) {
+						callbackWaiting();
+						callbackWaiting = false;
+					}
 				}
 			}, waitForRedirection);
 		});
@@ -293,7 +302,7 @@ module.exports = function(args) {
 
 			// The page has loaded, we've waited for all the ajax stuff to complete. We can go ahead and say the page is loaded
 			if (callbackWaiting && redirectTimeout) {
-				
+
 				debug("Callback from onLoadFinished");
 
 				callbackWaiting();

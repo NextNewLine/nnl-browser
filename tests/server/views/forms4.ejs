@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test page</title>
+        <script
+          src="https://code.jquery.com/jquery-3.3.1.js"
+          integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+          crossorigin="anonymous"></script>    
+    </head>
+
+    <body>
+        <h1>
+            I love forms (even the ajax handled slow ones)!
+        </h1>
+
+        <button type="submit" id="forumSubmitButton" onclick="submitform(event);">Submit</button>
+
+
+       <p id="formResults"></p>
+
+       <script type="text/javascript">
+         function submitform(event) {
+
+            var data = {};
+
+            $.post("/slowPostNoReply", data, function(results) {
+              document.location = "/htmlajax";
+            });
+         }
+       </script>
+    </body>
+</html>

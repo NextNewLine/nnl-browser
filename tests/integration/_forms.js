@@ -77,6 +77,38 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.uncheck(),
 		expect(await browser.text("#formResults")).to.contain("other");
 
 	});
+
+	it("Form submissions still work, even if it takes a while for the forum to submit", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/forms3");
+
+		await browser.fill("forumInputOne", "Forms4Life");
+		await browser.fill("formTextArea", "Textareasaremylife");
+		await browser.select("catlist", "Russian Blue");
+		await browser.choose("favePlant", "other");
+		
+		await browser.pressButton("#forumSubmitButton");
+
+		expect(await browser.text("#formResults")).to.contain("Forms4Life");
+		expect(await browser.text("#formResults")).to.contain("Textareasaremylife");
+		expect(await browser.text("#formResults")).to.contain("russianblue");
+		expect(await browser.text("#formResults")).to.contain("other");
+
+	});
+
+	it("Ajax slow Form submissions resulting in a redirect to a slow ajax loading page, still work", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/forms4");
+		
+		await browser.pressButton("#forumSubmitButton");
+
+		expect(await browser.text("#thirdParagraph")).to.contain("800ms here!");
+
+	});
 });
 
 // Currently can't Choose with a Selector & text, as a radio button has no text
