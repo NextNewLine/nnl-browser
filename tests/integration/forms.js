@@ -23,6 +23,27 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.uncheck(),
 
 	});
 
+
+	it("Input of type submit can be used", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/forms1");
+
+		await browser.fill("forumInputOne", "Forms4Life");
+		await browser.fill("formTextArea", "Textareasaremylife");
+		await browser.select("catlist", "Russian Blue");
+		await browser.choose("favePlant", "other");
+		
+		await browser.pressButton("InputSubmit");
+
+		expect(await browser.text("#formResults")).to.contain("Forms4Life");
+		expect(await browser.text("#formResults")).to.contain("Textareasaremylife");
+		expect(await browser.text("#formResults")).to.contain("russianblue");
+		expect(await browser.text("#formResults")).to.contain("other");
+
+	});
+
 	it("Choose and uncheck can be used", async function() {
 
 		const browser = new Browser();
