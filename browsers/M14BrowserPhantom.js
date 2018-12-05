@@ -45,7 +45,7 @@ module.exports = function() {
 
 			phantomPage = true;
 
-			var options = ["--ignore-ssl-errors=yes"];
+			var options = ["--ignore-ssl-errors=yes", "--ssl-protocol=any"];
 			if (!loadImages) {
 				options.push("--load-images=no");
 			}
@@ -54,6 +54,8 @@ module.exports = function() {
 
 			phantomPage = await phantomInstance.createPage();
 			phantomPage.property("viewportSize", viewportSize);
+
+			//await phantomPage.setting("userAgent", 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/53 (KHTML, like Gecko) Chrome/15.0.87');
 
 			if (basicAuthUsername && basicAuthPassword) {
 				await phantomPage.setting("userName", basicAuthUsername);

@@ -289,8 +289,8 @@ module.exports = function(args) {
 		return m14BrowserDriver.screenshot(name);
 	}
 
-	async function onLoadFinished() {
-		log("onLoadFinished");
+	async function onLoadFinished(status) {
+		log("onLoadFinished", status);
 		let url = await m14BrowserDriver.property("url");
 		log("done " + "\x1b[34m" + url);
 
@@ -305,9 +305,9 @@ module.exports = function(args) {
 
 				debug("Callback from onLoadFinished");
 
-				callbackWaiting();
 				clearTimeout(redirectTimeout);
 				redirectTimeout = false;
+				callbackWaiting();
 				callbackWaiting = false;
 			}
 			navigationRequested = false;
