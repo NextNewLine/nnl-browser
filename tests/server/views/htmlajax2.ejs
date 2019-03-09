@@ -17,6 +17,8 @@
         </p>
         <p id="secondParagraph">
         </p>
+        <p id="thirdParagraph">
+        </p>
 
         <script type="text/javascript">
 
@@ -25,6 +27,12 @@
                     document.getElementById("secondParagraph").innerHTML = "100ms here!"
                 });
             }, 150);
+
+            setTimeout(function(){
+                $.get("/ajaxEndpoint800", function() {
+                    document.getElementById("thirdParagraph").innerHTML = "800ms here!"
+                });
+            }, 500);
                 
         </script>
     </body>

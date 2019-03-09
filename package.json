@@ -1,11 +1,11 @@
 {
   "name": "m14-browser",
-  "version": "0.2.1",
+  "version": "0.2.6",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
     "pretest": "pkill node; node tests/server/server.js & sleep 2;",
-    "test": "mocha tests/integration/ --ui qunit --reporter spec --timeout 20000 --recursive --bail --exit",
+    "test": "mocha tests/integration/ --ui qunit --reporter spec --timeout 30000 --recursive --bail --exit",
     "posttest": "pkill node",
     "start": "pkill node; node tests/server/server.js"
   },
@@ -21,11 +21,20 @@
     "phantom": "6.*"
   },
   "devDependencies": {
-    "mocha": "^5.2.0",
-    "basic-auth": "^2.0.0",
-    "chai": "4.*",
+    "basic-auth": "^2.0.1",
+    "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
+    "cookie-parser": "^1.4.3",
+    "dotenv": "^6.1.0",
     "ejs": "^2.6.1",
-    "express": "^4.16.3"
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "mocha": "^5.2.0",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5"
   },
   "author": "John Kershaw",
   "license": "MIT",

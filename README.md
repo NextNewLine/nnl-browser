@@ -46,7 +46,7 @@ describe('Given we view the forms1 page', function() {
     await browser.choose(".favouritePlant", "spiderplant");
     await browser.pressButton("#forumSubmitButton");
     
-    await browser.screenshot("myScreenshot");
+    await browser.screenShot("myScreenshot");
 
     expect(await browser.text("#formResults")).to.contain("Forms4Life");
     expect(await browser.text("#formResults")).to.contain("Textareasaremylife");
