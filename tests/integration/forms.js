@@ -34,6 +34,8 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.uncheck(),
 		await browser.fill("formTextArea", "Textareasaremylife");
 		await browser.select("catlist", "Russian Blue");
 		await browser.choose("favePlant", "other");
+
+		await browser.choose("likeCats");
 		
 		await browser.pressButton("InputSubmit");
 
@@ -41,6 +43,8 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.uncheck(),
 		expect(await browser.text("#formResults")).to.contain("Textareasaremylife");
 		expect(await browser.text("#formResults")).to.contain("russianblue");
 		expect(await browser.text("#formResults")).to.contain("other");
+		
+		expect(await browser.text("#formResults")).to.contain("likeCats");
 
 	});
 
