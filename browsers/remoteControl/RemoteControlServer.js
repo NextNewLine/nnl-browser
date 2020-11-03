@@ -37,7 +37,7 @@ module.exports = function(args) {
 
 	let theEvent = false;
 	app.get('/currentEvent', function(req, res) {
-		console.log("Current event requested");
+		//console.log("Current event requested");
 
 		if (!theEvent) {
 			return res.json(false);

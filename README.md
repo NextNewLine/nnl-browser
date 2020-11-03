@@ -2,7 +2,9 @@
 
 [![NPM](https://nodei.co/npm/m14-browser.png)](https://nodei.co/npm/m14-browser/)
 
-**M14 Browser** is tested to work with Node 8 or later. 
+The M14 Browser is a promise based browser built for testing websites and hybrid mobile apps. It's controlled through a simple interface and interacts with the webview by injects JavaScript into the page to control behaviour.
+
+It can support multiple browsers with the same interface, allowing us to change the browser of choice or test multiple browsers without changing our code.
 
 The project is still undergoing frequent changes.
 
@@ -21,9 +23,7 @@ Other browsers it'd be nice if we supported (but don't, yet)
 
 ## But why
 
-The M14 Browser is a Promise based browser great for testing. It's controlled through a basic interface, which in turn injects JS into the page to control behaviour.
-
-We're (John Kershaw, M14 Industries) building it as a testing tool so we can have a single, promise-based Browser interface which can control multiple different browsers.
+We're (John Kershaw, M14 Industries) building this as a testing tool so we can have a single, promise-based Browser interface which can control multiple different browsers.
 
 Here's an example:
 
@@ -57,7 +57,7 @@ describe('Given we view the forms1 page', function() {
 });
 ```
 
-## Browser
+## Browser API
 
 ### Control
 
@@ -88,6 +88,10 @@ Click a link.
 #### `browser.choose(selector, value)`
 
 Choose and click a radio button.
+
+#### `browser.check(selector, value)`
+
+The same as `.choose`.
 
 #### `browser.uncheck(selector, value)`
 

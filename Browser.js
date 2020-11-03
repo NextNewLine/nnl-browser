@@ -395,6 +395,7 @@ module.exports = function(args) {
 		pressButton,
 		clickLink,
 		choose,
+		check: choose,
 		uncheck,
 		text,
 		html,

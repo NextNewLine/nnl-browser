@@ -63,6 +63,21 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.uncheck(),
 
 	});
 
+	it("Check and uncheck can be used", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/forms1");
+
+		await browser.check("#favePlant2");
+		await browser.uncheck("#favePlant2");
+		
+		await browser.pressButton("#forumSubmitButton");
+
+		expect(await browser.text("#formResults")).not.to.contain("other");
+
+	});
+
 	it("Filled in values (using the inputs' id) are submitted in the form", async function() {
 
 		const browser = new Browser();
