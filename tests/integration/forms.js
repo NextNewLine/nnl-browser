@@ -78,40 +78,6 @@ describe('browser.fill(), browser.select(), browser.choose(), browser.uncheck(),
 
 	});
 
-	it("Filled in values (using the inputs' id) are submitted in the form", async function() {
-
-		const browser = new Browser();
-
-		await browser.visit("/forms1");
-
-		await browser.fill("#forumInputId", "CatsCatsCats");
-		await browser.fill("#formTextAreaId", "Woooooooo");
-		await browser.select("#CatListId", "siamese");
-		await browser.choose("#favePlant2");
-
-		await browser.pressButton("#forumSubmitButton");
-
-		expect(await browser.text("#formResults")).to.contain("CatsCatsCats");
-		expect(await browser.text("#formResults")).to.contain("Woooooooo");
-		expect(await browser.text("#formResults")).to.contain("siamese");
-		expect(await browser.text("#formResults")).to.contain("bostonfern");
-
-	});
-
-	it("Filled in values can use apostraphies and speech marks", async function() {
-
-		const browser = new Browser();
-
-		await browser.visit("/forms1");
-
-		await browser.fill("#forumInputId", `I'm a fan of "cats"`);
-
-		await browser.pressButton("#forumSubmitButton");
-
-		expect(await browser.text("#formResults")).to.contain(`I'm a fan of \\"cats\\"`);
-
-	});
-
 	it("A form can be submitted via ajax, even if the response takes a while", async function() {
 
 		const browser = new Browser();
