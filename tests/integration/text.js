@@ -75,15 +75,4 @@ describe('browser.text()', function() {
 
 	});
 
-	it("Waits for slow jQuery ajax requests to complete before checking", async function() {
-
-		const browser = new Browser({
-			debug: true
-		});
-
-		await browser.visit("/htmlajax2");
-
-		expect(await browser.text("#thirdParagraph")).to.contain("800ms here!");
-
-	});
 });
