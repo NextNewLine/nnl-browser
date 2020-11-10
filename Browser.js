@@ -8,7 +8,7 @@ module.exports = function(args) {
 
 	let baseUrl = "http://localhost:3000";
 
-	let waitForRedirection = 400; // how long to wait for a redirection after a button or link has been clicked?
+	let waitForRedirection = 100; // how long to wait for a redirection after a button or link has been clicked?
 
 	if (process.env.M14BROWSER_WAITTIMEOUT) {
 		waitForRedirection = Number(process.env.M14BROWSER_WAITTIMEOUT);
