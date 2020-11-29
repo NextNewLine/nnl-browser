@@ -25,6 +25,18 @@ describe('browser.clickLink()', function() {
 
 	});
 
+	it("Links can be case insensitive", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/link1");
+		
+		await browser.clickLink("I LIKE cats");
+
+		expect(await browser.text()).to.contain("Link 2");
+
+	});
+
 	it("Links which have a delay before they change page will work.", async function() {
 
 		const browser = new Browser({

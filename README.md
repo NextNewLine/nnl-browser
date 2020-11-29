@@ -81,9 +81,13 @@ Select an option from a selection drop down
 
 Press a button. This includes Bootstrap's `a.btn`.
 
+If the selector is text, the first button with the selector as its text (case insensitive) is pressed. 
+
 #### `browser.clickLink(selector)`
 
 Click a link.
+
+If the selector is text, the first anchro tag with the selector as its text contents (case insensitive) is clicked. 
 
 #### `browser.choose(selector, value)`
 
