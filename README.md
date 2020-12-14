@@ -89,6 +89,8 @@ Click a link.
 
 If the selector is text, the first anchro tag with the selector as its text contents (case insensitive) is clicked. 
 
+If there is an exact match, that link will be clicked. If there are no links with an exact match, any link with the selector in will be clicked.
+
 #### `browser.choose(selector, value)`
 
 Choose and click a radio button.

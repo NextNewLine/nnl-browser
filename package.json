@@ -1,11 +1,11 @@
 {
   "name": "m14-browser",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
     "pretest": "node tests/server/server.js & sleep 2;",
-    "test": "npx mocha tests/integration --ui bdd --reporter spec --timeout 30000 --recursive --bail --exit",
+    "test": "npx mocha tests/integration --ui bdd --reporter spec --timeout 30000 --recursive --bail --exit || :",
     "posttest": "pkill node;",
     "start": "node tests/server/server.js"
   },

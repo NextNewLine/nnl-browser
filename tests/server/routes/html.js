@@ -40,4 +40,8 @@ module.exports = function(app) {
 		res.render("link7");
 	});
 
+	app.get('/link8', function(req, res) {
+		res.render("link8");
+	});
+
 }

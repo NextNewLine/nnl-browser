@@ -107,4 +107,15 @@ describe('browser.clickLink()', function() {
 
 	});
 
+	it("There are several links on the page but only one is an exact match to the string supplied, so click that", async function() {
+
+		const browser = new Browser();
+
+		await browser.visit("/link8");
+		await browser.clickLink("One");
+
+		expect(await browser.text()).to.contain("Link 6");
+		
+	});
+
 });
