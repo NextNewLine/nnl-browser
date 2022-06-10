@@ -74,7 +74,7 @@ module.exports = function(args) {
 	});
 
 	app.on('close', function() {
-		console.log('Stopping M14 Remote Control Server');
+		console.log('Stopping NNL Remote Control Server');
 	});
 
 	process.on('SIGINT', function() {

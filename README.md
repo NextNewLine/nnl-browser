@@ -1,8 +1,6 @@
-# M14 Browser
+# NextNewLine Browser
 
-[![NPM](https://nodei.co/npm/m14-browser.png)](https://nodei.co/npm/m14-browser/)
-
-The M14 Browser is a promise based browser built for testing websites and hybrid mobile apps. It's controlled through a simple interface and interacts with the webview by injects JavaScript into the page to control behaviour.
+The NextNewLine Browser is a promise based browser built for testing websites and hybrid mobile apps. It's controlled through a simple interface and interacts with the webview by injects JavaScript into the page to control behaviour.
 
 It can support multiple browsers with the same interface, allowing us to change the browser of choice or test multiple browsers without changing our code.
 
@@ -23,12 +21,12 @@ Other browsers it'd be nice if we supported (but don't, yet)
 
 ## But why
 
-We're (John Kershaw, M14 Industries) building this as a testing tool so we can have a single, promise-based Browser interface which can control multiple different browsers.
+We're (John Kershaw, NextNewLine) building this as a testing tool so we can have a single, promise-based Browser interface which can control multiple different browsers.
 
 Here's an example:
 
 ```js
-const Browser = require("m14-browser");
+const Browser = require("nnl-browser");
 const expect = require('chai').expect;
 
 
@@ -165,12 +163,12 @@ The process works by running a Remote Control Server on port 1414. The browser l
 
 Our testing code sends server-side commands to the Remote Control Server, which it in turn sends on to the browser-side `remoteControl.js`. Results are relayed back.
 
-The `browser` object becomes a relay, not an actual browser. It is functionally the same from the perspective of the code using it but you have to manually open your own browser for it to use. This could mean you manually openning Chrome (great if you want to watch the tests), or another instance of the `m14 browser` (great for automation), or even a Cordova webview running on an actual device (great for real-world integration testing).
+The `browser` object becomes a relay, not an actual browser. It is functionally the same from the perspective of the code using it but you have to manually open your own browser for it to use. This could mean you manually openning Chrome (great if you want to watch the tests), or another instance of the `nnl browser` (great for automation), or even a Cordova webview running on an actual device (great for real-world integration testing).
 
 For example:
 
 ```node
-const Browser = require("m14-browser");
+const Browser = require("nnl-browser");
 const expect = require('chai').expect;
 
 describe('Remote Control browser.text()', () => {

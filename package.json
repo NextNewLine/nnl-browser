@@ -1,5 +1,5 @@
 {
-  "name": "m14-browser",
+  "name": "@nextnewline/nnl-browser",
   "version": "0.3.1",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/M14Industries/m14-browser.git"
+    "url": "git+https://github.com/NextNewLine/nnl-browser.git"
   },
   "keywords": [
     "browser",
@@ -37,7 +37,7 @@
   "author": "John Kershaw",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/M14Industries/m14-browser/issues"
+    "url": "https://github.com/NextNewLine/nnl-browser/issues"
   },
-  "homepage": "https://github.com/M14Industries/m14-browser#readme"
+  "homepage": "https://github.com/NextNewLine/nnl-browser#readme"
 }
