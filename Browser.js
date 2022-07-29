@@ -2,6 +2,7 @@ const Scripts = require('./lib/Scripts');
 const TwirlTimer = require('./lib/TwirlTimer');
 
 const M14BrowserPhantom = require("./browsers/M14BrowserPhantom");
+const NNLBrowserPuppeteer = require("./browsers/NNLBrowserPuppeteer");
 const M14BrowserRemoteControl = require("./browsers/M14BrowserRemoteControl");
 
 module.exports = function(args) {
@@ -54,8 +55,10 @@ module.exports = function(args) {
 	let m14BrowserDriver;
 	if (args && args.remoteControl) {
 		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
+	} else if (args && args.phantom) {
+		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
 	} else {
-		m14BrowserDriver = new M14BrowserPhantom(driverArgs);
+		m14BrowserDriver = new NNLBrowserPuppeteer(driverArgs);
 	}
 
 	var callbackWaiting;
@@ -223,7 +226,7 @@ module.exports = function(args) {
 	var pendingAjax = function() {
 		return new Promise(async (resolve) => {
 			const script = await Scripts.fetch("pendingjQueryAjax");
-			const pendingCount = await m14BrowserDriver.evaluateJavaScript(script);
+			const pendingCount = await m14BrowserDriver.evaluateJavaScript(script, true);
 			resolve(pendingCount);
 
 		});

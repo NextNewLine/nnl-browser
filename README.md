@@ -8,16 +8,11 @@ The project is still undergoing frequent changes.
 
 ### An easy to use headless browser, good for testing
 
-Currently two browsers are supported:
+Currently three browsers are supported:
 
+* [Puppeteer](https://pptr.dev/) - a headless chromium controller
 * [PhantomJS](https://www.npmjs.com/package/phantom) - a headless web browser (no longer in development)
 * [Remote control](#remote-control) - control any browser or webview in real-time
-
-Other browsers it'd be nice if we supported (but don't, yet)
-
-* Puppeteer - Headless Chrome
-* Selenium - Handy browser automation
-* Zombie.js - Similar to PhantomJS
 
 ## But why
 

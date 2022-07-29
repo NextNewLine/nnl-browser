@@ -66,7 +66,8 @@ describe('browser.text()', function() {
 	it("Waits for jQuery ajax requests to complete before checking even if the request takes a while to start", async function() {
 
 		const browser = new Browser({
-			debug: true
+			debug: true,
+			waitForRedirection: 200
 		});
 
 		await browser.visit("/htmlajax2");
