@@ -9,7 +9,7 @@ module.exports = function(args) {
 
 	let baseUrl = "http://localhost:3000";
 
-	let waitForRedirection = 100; // how long to wait for a redirection after a button or link has been clicked?
+	let waitForRedirection = 250; // how long to wait for a redirection after a button or link has been clicked?
 
 	if (process.env.M14BROWSER_WAITTIMEOUT) {
 		waitForRedirection = Number(process.env.M14BROWSER_WAITTIMEOUT);
@@ -188,8 +188,6 @@ module.exports = function(args) {
 		log(command + " '" + selector + "'");
 		return new Promise(async function(resolve, reject) {
 
-			callbackWaiting = resolve;
-
 			const script = await Scripts.fetch(command, selector);
 			await m14BrowserDriver.evaluateJavaScript(script);
 
@@ -202,8 +200,8 @@ module.exports = function(args) {
 
 			redirectTimeout = setTimeout(async () => {
 				debug("activateElement Finished waitForRedirection");
-				if (!navigationRequested && callbackWaiting) {
-					debug("activateElement !navigationRequested && callbackWaiting");
+				if (!navigationRequested) {
+					debug("activateElement !navigationRequested");
 
 					if (await pendingAjax() > 0) {
 						log(command + " (within activateElement) waiting for all pending ajax calls to complete '" + selector + "'");
@@ -213,11 +211,7 @@ module.exports = function(args) {
 					log(command + " complete (within activateElement) no navigationRequested '" + selector + "'");
 					debug("Callback from activateElement");
 
-					// if the active Element caused the page to reload, the callback may have been called by the onLoadFinish event
-					if (callbackWaiting) {
-						callbackWaiting();
-						callbackWaiting = false;
-					}
+					resolve();
 				}
 			}, waitForRedirection);
 		});

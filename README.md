@@ -51,8 +51,9 @@ describe('Given we view the forms1 page', function() {
 ```
 ## V1 Beta
 
-* Beta 0 is a first attemp
-* Beta 1 allows the `phantom` property to be set
+* Beta 0 is a first attempt
+* Beta 1 allows the `phantom` property to be set to use the legacy mode
+* Beta 2 increased waittimeout to 250ms, and removed the callbackWaiting from activeElement
 
 ## Browser API
 
