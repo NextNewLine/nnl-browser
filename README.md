@@ -11,7 +11,6 @@ The project is still undergoing frequent changes.
 Currently three browsers are supported:
 
 * [Puppeteer](https://pptr.dev/) - a headless chromium controller
-* [PhantomJS](https://www.npmjs.com/package/phantom) - a headless web browser (no longer in development)
 * [Remote control](#remote-control) - control any browser or webview in real-time
 
 ## But why
@@ -54,6 +53,7 @@ describe('Given we view the forms1 page', function() {
 * Beta 0 is a first attempt
 * Beta 1 allows the `phantom` property to be set to use the legacy mode
 * Beta 2 increased waittimeout to 250ms, and removed the callbackWaiting from activeElement
+* Beta 3 removes Phantom
 
 ## Browser API
 

@@ -1,6 +1,6 @@
 {
   "name": "@nextnewline/nnl-browser",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
@@ -18,7 +18,6 @@
     "testing"
   ],
   "dependencies": {
-    "phantom": "6.*",
 	"puppeteer": "^15.5.0"
   },
   "devDependencies": {
