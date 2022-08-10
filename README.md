@@ -49,6 +49,10 @@ describe('Given we view the forms1 page', function() {
   });
 });
 ```
+## V1 Beta
+
+* Beta 0 is a first attemp
+* Beta 1 allows the `phantom` property to be set
 
 ## Browser API
 

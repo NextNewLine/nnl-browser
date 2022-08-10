@@ -1,6 +1,6 @@
 {
   "name": "@nextnewline/nnl-browser",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {

@@ -56,7 +56,7 @@ module.exports = function(args) {
 	if (args && args.remoteControl) {
 		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
 	} else if (args && args.phantom) {
-		m14BrowserDriver = new M14BrowserRemoteControl(driverArgs);
+		m14BrowserDriver = new M14BrowserPhantom(driverArgs);
 	} else {
 		m14BrowserDriver = new NNLBrowserPuppeteer(driverArgs);
 	}
