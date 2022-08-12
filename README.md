@@ -4,7 +4,7 @@ The NextNewLine Browser is a promise based browser built for testing websites an
 
 It can support multiple browsers with the same interface, allowing us to change the browser of choice or test multiple browsers without changing our code.
 
-The project is still undergoing frequent changes.
+The project is still undergoing frequent changes, and is a fork/sibling of the M14 Browser.
 
 ### An easy to use headless browser, good for testing
 
@@ -48,12 +48,6 @@ describe('Given we view the forms1 page', function() {
   });
 });
 ```
-## V1 Beta
-
-* Beta 0 is a first attempt
-* Beta 1 allows the `phantom` property to be set to use the legacy mode
-* Beta 2 increased waittimeout to 250ms, and removed the callbackWaiting from activeElement
-* Beta 3 removes Phantom
 
 ## Browser API
 
