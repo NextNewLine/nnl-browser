@@ -1,6 +1,6 @@
 {
   "name": "@nextnewline/nnl-browser",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A promise controlled browser ideal for testing",
   "main": "Browser.js",
   "scripts": {
@@ -18,21 +18,19 @@
     "testing"
   ],
   "dependencies": {
-	"puppeteer": "^15.5.0"
+	"puppeteer": "^19.4.1"
   },
   "devDependencies": {
     "basic-auth": "^2.0.1",
     "body-parser": "^1.18.3",
     "chai": "^4.2.0",
     "cookie-parser": "^1.4.3",
-    "dotenv": "^8.2.0",
+    "dotenv": "^16.0.0",
     "ejs": "^3.1.5",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
-    "mocha": "^8.2.0",
-    "morgan": "^1.9.1",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.5"
+    "mocha": "^10.2.0",
+    "morgan": "^1.9.1"
   },
   "author": "John Kershaw",
   "license": "MIT",

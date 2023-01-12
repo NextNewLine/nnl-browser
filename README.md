@@ -8,7 +8,7 @@ The project is still undergoing frequent changes, and is a fork/sibling of the M
 
 ### An easy to use headless browser, good for testing
 
-Currently three browsers are supported:
+Currently these browsers are supported:
 
 * [Puppeteer](https://pptr.dev/) - a headless chromium controller
 * [Remote control](#remote-control) - control any browser or webview in real-time
@@ -20,7 +20,7 @@ We're (John Kershaw, NextNewLine) building this as a testing tool so we can have
 Here's an example:
 
 ```js
-const Browser = require("nnl-browser");
+const Browser = require("@nextnewline/nnl-browser");
 const expect = require('chai').expect;
 
 
